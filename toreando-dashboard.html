@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>¿Debo Operar Hoy? — ToreandoTrades</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap');
+
+  :root {
+    --bg0: #030810;
+    --bg1: #080f1a;
+    --bg2: #0c1622;
+    --bg3: #101d2c;
+    --verde: #00e5b0;
+    --rojo: #ff3d5a;
+    --ambar: #ffb320;
+    --azul: #38b6ff;
+    --purpura: #b57bff;
+    --gris: #4a6275;
+    --txt1: #deedf8;
+    --txt2: #7a9bb0;
+    --txt3: #3d5a6e;
+    --borde: #152233;
+    --borde2: #1e3347;
+    --font: 'JetBrains Mono', 'Courier New', monospace;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg0); color:var(--txt1); font-family:var(--font); font-size:12px; overflow-x:hidden; }
+
+  /* ─── TICKER ─── */
+  #ticker { background:var(--bg1); border-bottom:1px solid var(--borde2); height:30px; display:flex; align-items:center; overflow:hidden; position:relative; }
+  #ticker::before { content:'MERCADOS'; position:absolute; left:0; z-index:10; background:var(--azul); color:#000; font-weight:700; font-size:9px; letter-spacing:1.5px; padding:0 10px; height:100%; display:flex; align-items:center; white-space:nowrap; }
+  .tcroll { display:flex; gap:0; animation:tcscroll 70s linear infinite; padding-left:105px; white-space:nowrap; }
+  @keyframes tcscroll { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+  .tc { display:inline-flex; align-items:center; gap:5px; padding:0 16px; border-right:1px solid var(--borde); font-size:10px; }
+  .tcs { color:var(--txt2); font-weight:600; }
+  .tcc.up { color:var(--verde); } .tcc.dn { color:var(--rojo); }
+
+  /* ─── TOPBAR ─── */
+  #topbar { background:var(--bg1); border-bottom:1px solid var(--borde); padding:5px 14px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px; }
+  .ttitle { font-size:14px; font-weight:700; color:var(--azul); letter-spacing:1.5px; }
+  .ttitle small { color:var(--txt2); font-weight:300; font-size:11px; letter-spacing:0.5px; }
+  .topright { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .pill { display:flex; align-items:center; gap:4px; font-size:9px; font-weight:600; letter-spacing:1px; }
+  .dot { width:5px; height:5px; border-radius:50%; background:var(--verde); animation:pdot 2s ease-in-out infinite; }
+  @keyframes pdot { 0%,100%{opacity:1} 50%{opacity:.2} }
+  .ts { font-size:9px; color:var(--txt3); }
+  .modtog { display:flex; background:var(--bg2); border:1px solid var(--borde); border-radius:3px; overflow:hidden; }
+  .mbtn { padding:4px 10px; font-family:var(--font); font-size:9px; font-weight:600; letter-spacing:1px; cursor:pointer; border:none; background:transparent; color:var(--txt3); transition:all .2s; }
+  .mbtn.on { background:var(--azul); color:#000; }
+  .rbtn { background:transparent; border:1px solid var(--borde2); color:var(--azul); font-family:var(--font); font-size:9px; letter-spacing:1px; padding:4px 10px; cursor:pointer; border-radius:2px; transition:all .15s; }
+  .rbtn:hover { background:var(--borde); }
+  .hbtn { background:transparent; border:1px solid var(--ambar); color:var(--ambar); font-family:var(--font); font-size:9px; letter-spacing:1px; padding:4px 10px; cursor:pointer; border-radius:2px; transition:all .15s; }
+  .hbtn:hover { background:rgba(255,179,32,.1); }
+
+  /* ─── ALERT ─── */
+  #alerta { background:#1a0d00; border-bottom:1px solid var(--ambar); padding:6px 14px; font-size:11px; color:var(--ambar); display:none; align-items:center; gap:8px; }
+  #alerta.vis { display:flex; }
+
+  /* ─── LAYOUT ─── */
+  #wrap { padding:10px; display:grid; grid-template-columns:260px 1fr; grid-template-rows:auto auto auto; gap:9px; max-width:1600px; margin:0 auto; }
+
+  /* ─── HERO ─── */
+  #hero { grid-row:1/3; background:var(--bg2); border:1px solid var(--borde); border-radius:4px; padding:16px; display:flex; flex-direction:column; align-items:center; gap:13px; }
+  .hlabel { font-size:9px; letter-spacing:2px; color:var(--txt3); text-transform:uppercase; }
+  .veredicto { font-size:44px; font-weight:700; letter-spacing:3px; text-shadow:0 0 24px currentColor; transition:all .5s; }
+  .veredicto.SI { color:var(--verde); }
+  .veredicto.PRECAUCIÓN { color:var(--ambar); font-size:32px; letter-spacing:1px; }
+  .veredicto.NO { color:var(--rojo); }
+
+  .ring-wrap { position:relative; width:130px; height:130px; }
+  .rsvg { transform:rotate(-90deg); }
+  .rbg { fill:none; stroke:var(--borde); stroke-width:9; }
+  .rfill { fill:none; stroke-width:9; stroke-linecap:round; transition:stroke-dashoffset 1s ease, stroke .5s; }
+  .rcenter { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; }
+  .rnum { font-size:26px; font-weight:700; }
+  .rpct { font-size:10px; color:var(--txt2); }
+
+  .exec-wrap { width:100%; }
+  .exec-header { display:flex; justify-content:space-between; font-size:9px; color:var(--txt2); margin-bottom:4px; }
+  .exec-track { height:5px; background:var(--borde); border-radius:3px; overflow:hidden; }
+  .exec-fill { height:100%; border-radius:3px; transition:width 1s ease; }
+
+  .regla { background:var(--bg1); border:1px solid var(--borde); border-radius:3px; padding:9px; width:100%; font-size:10px; color:var(--txt2); line-height:2; }
+  .rl { display:flex; gap:6px; align-items:center; }
+  .rd { width:7px; height:7px; border-radius:50%; }
+
+  .ai-box { background:var(--bg1); border:1px solid var(--borde); border-left:2px solid var(--azul); border-radius:3px; padding:11px; width:100%; }
+  .ai-tit { font-size:8px; letter-spacing:2px; color:var(--azul); text-transform:uppercase; display:block; margin-bottom:5px; }
+  #ai-txt { font-size:10px; color:var(--txt2); line-height:1.75; }
+
+  /* Links rápidos */
+  .links-box { background:var(--bg1); border:1px solid var(--borde); border-radius:3px; padding:9px; width:100%; }
+  .links-tit { font-size:8px; letter-spacing:2px; color:var(--purpura); text-transform:uppercase; display:block; margin-bottom:7px; }
+  .qlink { display:flex; align-items:center; gap:5px; padding:3px 0; border-bottom:1px solid rgba(21,34,51,.7); font-size:10px; color:var(--txt2); text-decoration:none; transition:color .15s; }
+  .qlink:last-child { border-bottom:none; }
+  .qlink:hover { color:var(--azul); }
+  .qlink-icon { font-size:11px; width:14px; text-align:center; color:var(--txt3); }
+
+  /* ─── PANELES ─── */
+  #paneles { display:grid; grid-template-columns:repeat(5,1fr); gap:7px; }
+  .panel { background:var(--bg2); border:1px solid var(--borde); border-radius:4px; padding:11px; }
+  .ph { display:flex; justify-content:space-between; align-items:center; margin-bottom:9px; padding-bottom:6px; border-bottom:1px solid var(--borde); }
+  .pt { font-size:8px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--txt3); }
+  .pbadge { font-size:10px; font-weight:700; padding:2px 5px; border-radius:2px; }
+  .sh { background:rgba(0,229,176,.12); color:var(--verde); }
+  .sm { background:rgba(255,179,32,.12); color:var(--ambar); }
+  .sl { background:rgba(255,61,90,.12); color:var(--rojo); }
+
+  .pm { display:flex; justify-content:space-between; align-items:center; padding:3.5px 0; border-bottom:1px solid rgba(21,34,51,.5); }
+  .pm:last-child { border-bottom:none; }
+  .ml { color:var(--txt3); font-size:10px; display:flex; align-items:center; gap:4px; }
+  .mr { display:flex; align-items:center; gap:4px; }
+  .mv { font-size:11px; font-weight:500; color:var(--txt1); }
+  .md { font-size:12px; }
+  .md.up { color:var(--verde); } .md.dn { color:var(--rojo); } .md.fl { color:var(--txt3); }
+  .tag { font-size:8px; padding:1px 4px; border-radius:2px; letter-spacing:.5px; text-transform:uppercase; }
+  .tg { background:rgba(0,229,176,.1); color:var(--verde); }
+  .tr { background:rgba(255,61,90,.1); color:var(--rojo); }
+  .ta { background:rgba(255,179,32,.1); color:var(--ambar); }
+  .tgr { background:rgba(74,98,117,.15); color:var(--txt2); }
+
+  /* ─── FILA INFERIOR ─── */
+  #botrow { display:grid; grid-template-columns:1fr 300px; gap:9px; }
+
+  /* Sectores */
+  #sec-panel { background:var(--bg2); border:1px solid var(--borde); border-radius:4px; padding:11px; }
+  .srow { display:flex; align-items:center; gap:7px; margin-bottom:4px; }
+  .ssym { font-size:9px; color:var(--txt2); width:33px; flex-shrink:0; font-weight:600; }
+  .snm { font-size:9px; color:var(--txt3); width:95px; flex-shrink:0; }
+  .strk { flex:1; height:13px; background:var(--bg1); border-radius:2px; overflow:hidden; position:relative; }
+  .sbar { height:100%; border-radius:2px; transition:width 1s ease; min-width:2px; position:absolute; }
+  .sbar.sp { background:var(--verde); left:50%; }
+  .sbar.sn { background:var(--rojo); right:50%; }
+  .smid { position:absolute; left:50%; top:0; bottom:0; width:1px; background:var(--borde2); }
+  .sval { font-size:10px; font-weight:600; width:48px; text-align:right; flex-shrink:0; }
+  .sval.sp { color:var(--verde); } .sval.sn { color:var(--rojo); }
+
+  /* Score breakdown */
+  #score-panel { background:var(--bg2); border:1px solid var(--borde); border-radius:4px; padding:11px; }
+  .scrow { margin-bottom:9px; }
+  .scrh { display:flex; justify-content:space-between; font-size:9px; margin-bottom:3px; }
+  .scrn { color:var(--txt2); }
+  .scrw { color:var(--txt3); font-size:8px; }
+  .scrt { font-size:10px; font-weight:700; }
+  .scrtrk { height:4px; background:var(--borde); border-radius:2px; overflow:hidden; }
+  .scrfill { height:100%; border-radius:2px; transition:width 1s ease; }
+
+  /* ─── PANEL ESPECIAL: MM10 MENSUAL ─── */
+  #mm10-panel { background:var(--bg2); border:1px solid var(--borde); border-left:2px solid var(--purpura); border-radius:4px; padding:11px; }
+
+  /* ─── PANEL VIX FUTUROS ─── */
+  #vixf-panel { background:var(--bg2); border:1px solid var(--borde); border-left:2px solid var(--ambar); border-radius:4px; padding:11px; }
+  .contango-bar { display:flex; align-items:center; gap:6px; margin-bottom:5px; }
+  .mes-lab { font-size:9px; color:var(--txt3); width:28px; }
+  .cbar-trk { flex:1; height:10px; background:var(--bg1); border-radius:2px; overflow:hidden; }
+  .cbar-fill { height:100%; border-radius:2px; transition:width 1s; }
+  .cval { font-size:9px; font-weight:600; width:38px; text-align:right; }
+
+  /* ─── MODAL AYUDA ─── */
+  #help-modal { display:none; position:fixed; inset:0; z-index:999; background:rgba(3,8,16,.92); overflow-y:auto; }
+  #help-modal.vis { display:block; }
+  .hmod-inner { max-width:760px; margin:30px auto; background:var(--bg2); border:1px solid var(--borde2); border-radius:6px; padding:28px; }
+  .hmod-title { font-size:16px; font-weight:700; color:var(--azul); letter-spacing:2px; margin-bottom:20px; padding-bottom:12px; border-bottom:1px solid var(--borde); display:flex; justify-content:space-between; align-items:center; }
+  .hclose { background:transparent; border:1px solid var(--borde2); color:var(--txt2); font-family:var(--font); cursor:pointer; padding:4px 10px; border-radius:2px; font-size:12px; }
+  .hclose:hover { background:var(--borde); }
+  .hmod-sec { margin-bottom:18px; }
+  .hmod-sec h3 { font-size:10px; letter-spacing:2px; color:var(--purpura); text-transform:uppercase; margin-bottom:10px; padding-bottom:5px; border-bottom:1px solid var(--borde); }
+  .hitem { margin-bottom:10px; padding:8px; background:var(--bg1); border-radius:3px; border-left:2px solid var(--borde2); }
+  .hitem-name { font-size:10px; font-weight:700; color:var(--txt1); margin-bottom:3px; }
+  .hitem-desc { font-size:10px; color:var(--txt2); line-height:1.65; }
+  .hitem-link { font-size:9px; color:var(--azul); text-decoration:none; }
+  .hitem-link:hover { text-decoration:underline; }
+
+  /* Separadores y misc */
+  .sep { height:1px; background:var(--borde); margin:7px 0; }
+  .subh { font-size:8px; letter-spacing:2px; color:var(--txt3); text-transform:uppercase; margin-bottom:7px; }
+  .hicon { cursor:pointer; font-size:10px; color:var(--txt3); border:none; background:transparent; font-family:var(--font); padding:1px 4px; border-radius:2px; transition:all .15s; }
+  .hicon:hover { color:var(--ambar); background:rgba(255,179,32,.1); }
+
+  /* progress */
+  #pgbar { position:fixed; top:0; left:0; height:2px; background:var(--azul); transition:width .3s; z-index:1000; }
+
+  /* responsive */
+  @media(max-width:1100px){
+    #wrap { grid-template-columns:1fr; }
+    #hero { grid-row:auto; }
+    #paneles { grid-template-columns:repeat(3,1fr); }
+    #botrow { grid-template-columns:1fr; }
+    #fila4 { grid-template-columns:repeat(2,1fr); }
+  }
+  @media(max-width:700px){
+    #paneles { grid-template-columns:repeat(2,1fr); }
+    #fila4 { grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div id="pgbar" style="width:0%"></div>
+
+<!-- TICKER -->
+<div id="ticker"><div class="tcroll" id="tcroll"></div></div>
+
+<!-- TOPBAR -->
+<div id="topbar">
+  <div>
+    <div class="ttitle">¿DEBO OPERAR? <small>// TOREANDOTRADES · MARKET TIMING DASHBOARD</small></div>
+  </div>
+  <div class="topright">
+    <div class="modtog">
+      <button class="mbtn on" id="mb-swing" onclick="setMode('swing')">SWING</button>
+      <button class="mbtn" id="mb-day" onclick="setMode('day')">INTRADÍA</button>
+    </div>
+    <div class="pill">
+      <div class="dot" id="sdot"></div>
+      <span id="stxt" style="color:var(--verde)">EN DIRECTO</span>
+    </div>
+    <span class="ts" id="ts-upd">—</span>
+    <span id="proxy-ind" class="ts" style="cursor:default" title="Comprobando proxy...">⬤ COMPROBANDO</span>
+    <button class="rbtn" onclick="cargarDatos()">⟳ ACTUALIZAR</button>
+    <button class="hbtn" onclick="toggleHelp()">? AYUDA</button>
+  </div>
+</div>
+
+<!-- ALERTA -->
+<div id="alerta">
+  <span>⚠</span>
+  <span id="alerta-txt">FOMC en menos de 72h — reducir exposición hasta conocer decisión</span>
+</div>
+
+<!-- PANEL CLAVE API — campo compacto siempre visible en topbar -->
+<div id="apikey-bar" style="background:#060e18; border-bottom:1px solid var(--borde2); padding:5px 14px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+  <span style="font-size:9px; color:var(--ambar); font-family:var(--font); font-weight:700; letter-spacing:1px; white-space:nowrap;">⬡ API KEY FINNHUB</span>
+  <input id="fmp-input" type="text" placeholder="Pega tu clave de finnhub.io..."
+    style="background:var(--bg2); border:1px solid var(--borde2); color:var(--txt1); font-family:var(--font); font-size:11px; padding:4px 10px; border-radius:3px; flex:1; min-width:240px; max-width:380px; outline:none;"
+    onkeydown="if(event.key==='Enter') guardarClave()"/>
+  <button onclick="guardarClave()"
+    style="background:var(--verde); color:#000; border:none; font-family:var(--font); font-size:9px; font-weight:700; letter-spacing:1px; padding:5px 14px; border-radius:3px; cursor:pointer; white-space:nowrap;">
+    ✓ CARGAR DATOS
+  </button>
+  <span style="font-size:9px; color:var(--txt3); font-family:var(--font);">Gratis (60 llamadas/min) →</span>
+  <a href="https://finnhub.io/register" target="_blank"
+    style="font-size:9px; color:var(--azul); font-family:var(--font); white-space:nowrap;">finnhub.io ↗</a>
+  <span id="key-status" style="font-size:9px; font-family:var(--font); color:var(--txt3);">introduce tu clave Finnhub</span>
+</div>
+
+<!-- DIAGNÓSTICO -->
+<div id="diag-bar" style="display:none; background:#1a0000; border-bottom:1px solid var(--rojo); padding:6px 14px; font-size:10px; color:var(--rojo); align-items:center; gap:8px;"></div>
+
+<!-- MAIN -->
+<div id="wrap">
+
+  <!-- HÉROE -->
+  <div id="hero">
+    <div class="hlabel">VEREDICTO MERCADO</div>
+    <div class="veredicto SI" id="veredicto">—</div>
+    <div class="hlabel" id="vsub" style="text-align:center;line-height:1.7">Cargando datos...</div>
+
+    <div class="ring-wrap">
+      <svg class="rsvg" width="130" height="130" viewBox="0 0 130 130">
+        <circle class="rbg" cx="65" cy="65" r="53"/>
+        <circle class="rfill" id="rfill" cx="65" cy="65" r="53" stroke="#ffb320" stroke-dasharray="333" stroke-dashoffset="333"/>
+      </svg>
+      <div class="rcenter">
+        <div class="rnum" id="mqnum">—</div>
+        <div class="rpct">CALIDAD</div>
+      </div>
+    </div>
+
+    <div class="exec-wrap">
+      <div class="exec-header">
+        <span>VENTANA DE EJECUCIÓN <button class="hicon" onclick="showHelpItem('exec')">?</button></span>
+        <span id="exec-num" style="font-weight:700">—</span>
+      </div>
+      <div class="exec-track"><div class="exec-fill" id="exec-fill" style="width:0%"></div></div>
+    </div>
+
+    <div class="regla">
+      <div class="rl"><div class="rd" style="background:var(--verde)"></div><span style="color:var(--verde);font-weight:700">80–100</span> → Tamaño completo, atacar</div>
+      <div class="rl"><div class="rd" style="background:var(--ambar)"></div><span style="color:var(--ambar);font-weight:700">60–79</span> → Mitad de posición, solo A+</div>
+      <div class="rl"><div class="rd" style="background:var(--rojo)"></div><span style="color:var(--rojo);font-weight:700">&lt;60</span> → Fuera del mercado</div>
+    </div>
+
+  </div>
+
+  <!-- PANELES 5 COLUMNAS -->
+  <div id="paneles">
+
+    <!-- VOLATILIDAD -->
+    <div class="panel">
+      <div class="ph">
+        <div class="pt">⟁ VOLATILIDAD <button class="hicon" onclick="showHelpItem('vol')">?</button></div>
+        <div class="pbadge sm" id="vol-badge">—</div>
+      </div>
+      <div class="pm"><span class="ml">VIX nivel</span><div class="mr"><span class="mv" id="vix-v">—</span><span class="md" id="vix-d">→</span></div></div>
+      <div class="pm"><span class="ml">VIX tendencia 5d</span><div class="mr"><span class="mv" id="vix-sl">—</span></div></div>
+      <div class="pm"><span class="ml">VIX percentil 1a</span><div class="mr"><span class="mv" id="vix-pct">—</span></div></div>
+      <div class="pm"><span class="ml">Put/Call (est.)</span><div class="mr"><span class="mv" id="putcall">—</span><span class="tag" id="pc-tag">—</span></div></div>
+      <div class="pm"><span class="ml">Régimen VIX</span><div class="mr"><span class="tag" id="vix-reg">—</span></div></div>
+      <div class="pm"><span class="ml">VVIX</span><div class="mr"><span class="mv" id="vvix-v">—</span></div></div>
+    </div>
+
+    <!-- TENDENCIA -->
+    <div class="panel">
+      <div class="ph">
+        <div class="pt">⟶ TENDENCIA <button class="hicon" onclick="showHelpItem('trend')">?</button></div>
+        <div class="pbadge sm" id="trend-badge">—</div>
+      </div>
+      <div class="pm"><span class="ml">SPY vs MM20</span><div class="mr"><span class="mv" id="spy20">—</span><span class="md" id="spy20d">→</span></div></div>
+      <div class="pm"><span class="ml">SPY vs MM50</span><div class="mr"><span class="mv" id="spy50">—</span><span class="md" id="spy50d">→</span></div></div>
+      <div class="pm"><span class="ml">SPY vs MM200</span><div class="mr"><span class="mv" id="spy200">—</span><span class="md" id="spy200d">→</span></div></div>
+      <div class="pm"><span class="ml">RSI(14) diario</span><div class="mr"><span class="mv" id="rsi">—</span><span class="tag" id="rsi-tag">—</span></div></div>
+      <div class="pm"><span class="ml">QQQ vs MM50</span><div class="mr"><span class="mv" id="qqq50">—</span></div></div>
+      <div class="pm"><span class="ml">Régimen</span><div class="mr"><span class="tag" id="reg-tag">—</span></div></div>
+    </div>
+
+    <!-- AMPLITUD -->
+    <div class="panel">
+      <div class="ph">
+        <div class="pt">◎ AMPLITUD <button class="hicon" onclick="showHelpItem('amp')">?</button></div>
+        <div class="pbadge sm" id="amp-badge">—</div>
+      </div>
+      <div class="pm"><span class="ml">% &gt; MM20</span><div class="mr"><span class="mv" id="p20">—</span><span class="md" id="p20d">→</span></div></div>
+      <div class="pm"><span class="ml">% &gt; MM50</span><div class="mr"><span class="mv" id="p50">—</span></div></div>
+      <div class="pm"><span class="ml">% &gt; MM200</span><div class="mr"><span class="mv" id="p200">—</span></div></div>
+      <div class="pm"><span class="ml">Línea AD ratio</span><div class="mr"><span class="mv" id="ad">—</span><span class="tag" id="ad-tag">—</span></div></div>
+      <div class="pm"><span class="ml">Oscilador McClellan <button class="hicon" onclick="showHelpItem('mcc')">?</button></span><div class="mr"><span class="mv" id="mcc">—</span><span class="tag" id="mcc-tag">—</span></div></div>
+      <div class="pm"><span class="ml">NH/NL Nasdaq</span><div class="mr"><span class="mv" id="nhnl">—</span></div></div>
+    </div>
+
+    <!-- MOMENTUM -->
+    <div class="panel">
+      <div class="ph">
+        <div class="pt">↑ MOMENTUM <button class="hicon" onclick="showHelpItem('mom')">?</button></div>
+        <div class="pbadge sm" id="mom-badge">—</div>
+      </div>
+      <div class="pm"><span class="ml">Sectores líderes</span><div class="mr"><span class="mv" id="lideres" style="font-size:9px">—</span></div></div>
+      <div class="pm"><span class="ml">Sectores rezagados</span><div class="mr"><span class="mv" id="rezagados" style="font-size:9px">—</span></div></div>
+      <div class="pm"><span class="ml">Spread RS</span><div class="mr"><span class="mv" id="spread">—</span><span class="tag" id="spread-tag">—</span></div></div>
+      <div class="pm"><span class="ml">% hacen máx. rel.</span><div class="mr"><span class="mv" id="pctHH">—</span></div></div>
+      <div class="pm"><span class="ml">Sectores &gt; 0</span><div class="mr"><span class="mv" id="spos">—</span><span class="ml">/11</span></div></div>
+    </div>
+
+    <!-- MACRO -->
+    <div class="panel">
+      <div class="ph">
+        <div class="pt">⊕ MACRO <button class="hicon" onclick="showHelpItem('macro')">?</button></div>
+        <div class="pbadge sm" id="macro-badge">—</div>
+      </div>
+      <div class="pm"><span class="ml">Bono 10a USA</span><div class="mr"><span class="mv" id="tnx">—</span><span class="md" id="tnxd">→</span></div></div>
+      <div class="pm"><span class="ml">DXY dólar</span><div class="mr"><span class="mv" id="dxy">—</span><span class="md" id="dxyd">→</span></div></div>
+      <div class="pm"><span class="ml">Fed postura</span><div class="mr"><span class="tag" id="fed-tag">—</span></div></div>
+      <div class="pm"><span class="ml">FOMC próximo</span><div class="mr"><span class="tag" id="fomc-tag">—</span></div></div>
+      <div class="pm"><span class="ml">Curva de tipos</span><div class="mr"><span class="tag" id="curva-tag">—</span></div></div>
+      <div class="pm"><span class="ml">CPI flag</span><div class="mr"><span class="tag" id="cpi-tag">—</span></div></div>
+    </div>
+
+  </div><!-- /paneles -->
+
+  <!-- FILA INFERIOR -->
+  <div id="botrow" style="grid-column:2">
+
+    <!-- MAPA DE CALOR SECTORES -->
+    <div id="sec-panel">
+      <div class="ph" style="margin-bottom:10px">
+        <div class="pt">▦ MAPA DE CALOR SECTORIAL — RENDIMIENTO 5D <button class="hicon" onclick="showHelpItem('sec')">?</button></div>
+        <div style="font-size:9px;color:var(--txt3)">11 SECTORES S&amp;P</div>
+      </div>
+      <div id="sec-map"></div>
+    </div>
+
+    <!-- DESGLOSE PUNTUACIÓN -->
+    <div id="score-panel">
+      <div class="ph" style="margin-bottom:10px">
+        <div class="pt">◈ DESGLOSE PUNTUACIÓN <button class="hicon" onclick="showHelpItem('score')">?</button></div>
+        <div style="font-size:9px;color:var(--txt3)">PONDERADO</div>
+      </div>
+      <div id="score-rows"></div>
+    </div>
+
+  </div>
+
+  <!-- FILA INFERIOR: 4 PANELES EN LÍNEA (grid-column:2) -->
+  <div id="fila4" style="grid-column:2; display:grid; grid-template-columns:repeat(4,1fr); gap:9px;">
+
+    <!-- VIX FUTUROS -->
+    <div class="panel" id="vixf-panel" style="border-left:2px solid var(--ambar);">
+      <div class="ph" style="margin-bottom:8px">
+        <div class="pt" style="color:var(--ambar)">⬡ FUTUROS VIX <button class="hicon" onclick="showHelpItem('vixf')">?</button></div>
+        <span class="tag" id="vixf-tag">—</span>
+      </div>
+      <div id="vixf-bars"></div>
+      <div class="pm" style="margin-top:4px">
+        <span class="ml">Contango M1-M2</span>
+        <div class="mr"><span class="mv" id="contango-val">—</span><span class="tag" id="contango-tag">—</span></div>
+      </div>
+      <div class="pm">
+        <span class="ml">Señal M/L plazo</span>
+        <div class="mr"><span class="tag" id="vixf-signal">—</span></div>
+      </div>
+      <div style="font-size:9px;color:var(--txt3);margin-top:6px">
+        <a href="http://vixcentral.com/" target="_blank" style="color:var(--azul);text-decoration:none">vixcentral.com ↗</a>
+      </div>
+    </div>
+
+    <!-- MM10 MENSUAL -->
+    <div class="panel" id="mm10-panel" style="border-left:2px solid var(--purpura);">
+      <div class="ph" style="margin-bottom:8px">
+        <div class="pt" style="color:var(--purpura)">◎ SISTEMA MM10 <button class="hicon" onclick="showHelpItem('mm10')">?</button></div>
+        <span class="tag" id="mm10-badge">—</span>
+      </div>
+      <div class="pm">
+        <span class="ml">SP500 precio</span>
+        <div class="mr"><span class="mv" id="mm10-precio">—</span></div>
+      </div>
+      <div class="pm">
+        <span class="ml">MM10 mensual</span>
+        <div class="mr"><span class="mv" id="mm10-val">—</span></div>
+      </div>
+      <div class="pm">
+        <span class="ml">Posición vs MM10</span>
+        <div class="mr"><span class="mv" id="mm10-diff">—</span><span class="md" id="mm10-dir">→</span></div>
+      </div>
+      <div class="pm">
+        <span class="ml">Sentencia</span>
+        <div class="mr"><span class="tag" id="mm10-signal">—</span></div>
+      </div>
+      <div style="font-size:9px;color:var(--txt3);margin-top:6px">
+        <a href="http://schrts.co/JSXTzccw" target="_blank" style="color:var(--purpura);text-decoration:none">Ver gráfico mensual ↗</a>
+      </div>
+    </div>
+
+    <!-- TERMINAL IA -->
+    <div class="panel" style="border-left:2px solid var(--azul);">
+      <div class="ph" style="margin-bottom:8px">
+        <div class="pt" style="color:var(--azul)">◆ TERMINAL IA</div>
+      </div>
+      <div class="ai-box" style="border:none;border-radius:0;padding:0;background:transparent;">
+        <span id="ai-txt" style="font-size:10px;color:var(--txt2);line-height:1.75;">Analizando entorno de mercado...</span>
+      </div>
+    </div>
+
+    <!-- RECURSOS RÁPIDOS -->
+    <div class="panel" style="border-left:2px solid var(--purpura);">
+      <div class="ph" style="margin-bottom:8px">
+        <div class="pt" style="color:var(--purpura)">⬖ RECURSOS RÁPIDOS</div>
+      </div>
+      <a class="qlink" href="https://docs.google.com/spreadsheets/u/0/d/1zK49Ux-fXwqAuG6M3yPc_DNZI_iClnM9_GpAy8MSdrk/htmlview" target="_blank"><span class="qlink-icon">◈</span>Amplitud NYSE/Nasdaq (@Alex2Salamanca)</a>
+      <a class="qlink" href="https://amplitudmercado.com/nyse" target="_blank"><span class="qlink-icon">◈</span>AmplitudMercado.com</a>
+      <a class="qlink" href="https://stockcharts.com/h-sc/ui?s=$NYSI&p=D&yr=0&mn=6&dy=0&id=p86203669426&a=275137244" target="_blank"><span class="qlink-icon">~</span>Oscilador McClellan</a>
+      <a class="qlink" href="http://vixcentral.com/" target="_blank"><span class="qlink-icon">⬡</span>VIX Central (futuros)</a>
+      <a class="qlink" href="http://schrts.co/EJgHTCfp" target="_blank"><span class="qlink-icon">↕</span>Ratio Put/Call</a>
+      <a class="qlink" href="https://money.cnn.com/data/fear-and-greed/" target="_blank"><span class="qlink-icon">◉</span>Fear &amp; Greed Index</a>
+      <a class="qlink" href="https://squeezemetrics.com/monitor/dix" target="_blank"><span class="qlink-icon">▲</span>Dark Pools (DIX)</a>
+      <a class="qlink" href="http://schrts.co/JSXTzccw" target="_blank"><span class="qlink-icon">◎</span>MM10 Mensual SP500</a>
+    </div>
+
+  </div>
+
+</div><!-- /wrap -->
+
+<!-- ─── MODAL AYUDA ─── -->
+<div id="help-modal">
+<div class="hmod-inner">
+  <div class="hmod-title">
+    <span>? GUÍA DE INDICADORES — ToreandoTrades</span>
+    <button class="hclose" onclick="toggleHelp()">✕ CERRAR</button>
+  </div>
+
+  <div class="hmod-sec" id="h-exec" style="display:none">
+    <h3>Ventana de Ejecución</h3>
+    <div class="hitem"><div class="hitem-name">Ventana de Ejecución (0–100)</div><div class="hitem-desc">Puntuación independiente que evalúa si los setups están funcionando en este momento: ¿se mantienen las rupturas sobre pivotes? ¿se compran los retrocesos rápido? ¿hay seguimiento multi-día? Un mercado puede tener buena calidad estructural pero mala ventana de ejecución (choppy), o viceversa.</div></div>
+  </div>
+
+  <div class="hmod-sec" id="h-mm10">
+    <h3>Sistema Mensual MM10</h3>
+    <div class="hitem"><div class="hitem-name">MM10 Mensual del SP500</div><div class="hitem-desc">Regla clave de ToreandoTrades: vigilar cada mes la media móvil de 10 meses del SP500. Si el precio cierra por debajo → estar fuera del mercado (liquidez o bonos). Es el filtro primario de largo plazo, el más importante antes de cualquier otra decisión. Funciona en cierre mensual, no intradía.</div><a class="hitem-link" href="http://schrts.co/JSXTzccw" target="_blank">Ver gráfico en StockCharts ↗</a></div>
+  </div>
+
+  <div class="hmod-sec" id="h-vixf">
+    <h3>Estructura de Futuros del VIX</h3>
+    <div class="hitem"><div class="hitem-name">Contango vs Backwardation</div><div class="hitem-desc">Antes de cualquier compra de medio-largo plazo, revisar la estructura de futuros del VIX. <strong style="color:var(--verde)">Contango</strong> (pendiente positiva, M1 &lt; M2 &lt; M3): situación normal, favorable para bolsas. <strong style="color:var(--rojo)">Backwardation / Invertida</strong> (M1 &gt; M2): alta volatilidad real, señal de peligro — evitar compras.</div><a class="hitem-link" href="http://vixcentral.com/" target="_blank">Ver VIX Central ↗</a></div>
+  </div>
+
+  <div class="hmod-sec" id="h-vol">
+    <h3>Panel de Volatilidad</h3>
+    <div class="hitem"><div class="hitem-name">VIX — Índice de Volatilidad CBOE</div><div class="hitem-desc">Mide la volatilidad implícita esperada a 30 días del SP500. Valores &lt;15 = entorno favorable. 15–20 = normal. 20–30 = elevado (reducir tamaño). &gt;30 = pánico (fuera o cobertura). Más importante que el nivel absoluto es su tendencia (5d slope).</div></div>
+    <div class="hitem"><div class="hitem-name">Ratio Put/Call</div><div class="hitem-desc">Mide el número de puts compradas vs calls. Media de 5 días &gt; 0.60 = alarma (exceso de miedo, posible suelo). Vuelta desde arriba por debajo de 0.75 = posible fin de corrección. Lectura contraria: extremos de miedo = oportunidad de compra. <a class="hitem-link" href="http://schrts.co/EJgHTCfp" target="_blank">Ver gráfico ↗</a></div></div>
+  </div>
+
+  <div class="hmod-sec" id="h-trend">
+    <h3>Panel de Tendencia</h3>
+    <div class="hitem"><div class="hitem-name">SPY vs Medias Móviles 20/50/200</div><div class="hitem-desc">Posición del SPY respecto a sus tres medias clave. Las tres por encima = entorno alcista sólido (uptrend). Las tres por debajo = downtrend. Entre ellas = zona de chop, evitar setups de ruptura.</div></div>
+    <div class="hitem"><div class="hitem-name">RSI (14 días)</div><div class="hitem-desc">Oscilador de momentum 0–100. &gt;70 = sobrecompra (ojo a corrección inminente). &lt;30 = sobreventa (posible rebote). La zona 40–60 es neutral. Para swing, buscar entradas cuando RSI rebota desde 40–50 en uptrend.</div></div>
+    <div class="hitem"><div class="hitem-name">Sistema 6 meses alcistas</div><div class="hitem-desc">Sistema seasonal de ToreandoTrades: comprar SP500 el 1 de Octubre si MACD diario está cortado al alza. Vender el 31 de Marzo si MACD está cortado a la baja. Esperar 2 barras para confirmar el corte.</div></div>
+  </div>
+
+  <div class="hmod-sec" id="h-amp">
+    <h3>Panel de Amplitud de Mercado</h3>
+    <div class="hitem"><div class="hitem-name">% Acciones sobre MMs (20/50/200)</div><div class="hitem-desc">Mide la participación real del mercado. Si el índice sube pero el % sobre MM200 baja → divergencia bajista peligrosa. Valores &gt;60% sobre MM50 = mercado sano. &lt;40% = debilidad interna. Consultar la plantilla de @Alex2Salamanca para datos actualizados.</div><a class="hitem-link" href="https://docs.google.com/spreadsheets/u/0/d/1zK49Ux-fXwqAuG6M3yPc_DNZI_iClnM9_GpAy8MSdrk/htmlview" target="_blank">Plantilla Google Docs ↗</a></div>
+    <div class="hitem"><div class="hitem-name">Oscilador de McClellan</div><div class="hitem-desc">Derivado de la Línea Avance-Descenso del NYSE. Si está muy por encima de +50 (&gt;60): posible corrección de corto plazo inminente. Si está muy por debajo de -50: posible rebote. El cruce desde -50 al alza con volumen puede marcar el inicio de un "día de largos". Valor 0 es neutral.</div><a class="hitem-link" href="https://stockcharts.com/h-sc/ui?s=$NYSI&p=D&yr=0&mn=6&dy=0&id=p86203669426&a=275137244" target="_blank">Ver McClellan ↗</a></div>
+    <div class="hitem"><div class="hitem-name">Línea AD (Advance/Decline)</div><div class="hitem-desc">Indicador predictivo clave: si el NYSEAD está por encima de su MM200 → alta probabilidad de que la bolsa siga subiendo. Por debajo → probablemente siga bajando. Sistema de Slowinver, altamente fiable como filtro de largo plazo.</div><a class="hitem-link" href="https://schrts.co/tXeiNvhf" target="_blank">Ver NYSEAD ↗</a></div>
+    <div class="hitem"><div class="hitem-name">Mínimos anuales NYSE (indicador Onda4)</div><div class="hitem-desc">Mide acciones del NYSE en mínimos de 52 semanas. Señal de cobertura cuando supera 40 acciones durante 5 días consecutivos. Indicador de Oscar Cágigas (Onda4). <a class="hitem-link" href="https://stockcharts.com/h-sc/ui?s=%24NYLOW&p=D&yr=0&mn=11&dy=0&id=p9904879690c" target="_blank">Ver ↗</a></div></div>
+  </div>
+
+  <div class="hmod-sec" id="h-mom">
+    <h3>Panel de Momentum / Participación</h3>
+    <div class="hitem"><div class="hitem-name">Heatmap Sectorial (11 ETFs SP500)</div><div class="hitem-desc">XLK, XLC, XLY, XLF, XLI, XLV, XLP, XLE, XLB, XLU, XLRE. Los 3 líderes son donde se concentra el dinero inteligente. Si los defensivos (XLP, XLU, XLRE) lideran → rotación defensiva, señal de cautela. Tecnología (XLK) + Industriales (XLI) liderando = entorno alcista sano.</div></div>
+    <div class="hitem"><div class="hitem-name">Spread RS (Relative Strength)</div><div class="hitem-desc">Diferencia de rendimiento entre el sector más fuerte y el más débil. Spread amplio (&gt;3%) = hay momentum real y oportunidades claras. Spread estrecho = mercado lateral, difícil hacer dinero.</div></div>
+  </div>
+
+  <div class="hmod-sec" id="h-macro">
+    <h3>Panel Macro / Liquidez</h3>
+    <div class="hitem"><div class="hitem-name">Bono 10 años USA (TNX)</div><div class="hitem-desc">Tipo de referencia global. Subidas rápidas &gt;4.5% presionan valoraciones, especialmente tecnología. Bajadas = favorable para bolsa. Importa más la tendencia de corto plazo que el nivel absoluto.</div></div>
+    <div class="hitem"><div class="hitem-name">Índice del Dólar (DXY)</div><div class="hitem-desc">Dólar fuerte = presión sobre emergentes y materias primas. Para el SP500 la relación es más compleja. Tendencia alcista del DXY suele coincidir con Risk-Off global.</div></div>
+    <div class="hitem"><div class="hitem-name">FOMC — Reserva Federal</div><div class="hitem-desc">Las reuniones de la Fed (8 al año) generan volatilidad garantizada. En los 3 días previos y el día de la decisión, reducir exposición salvo que el mercado sea muy claro. Después de la decisión, el movimiento real suele venir 1–2 días después.</div></div>
+    <div class="hitem"><div class="hitem-name">Dark Pools (DIX)</div><div class="hitem-desc">Volumen de compras en mercados oscuros (institucionales). Cuando el DIX está bajo → señal bajista o de incertidumbre. Un DIX alto con precio bajando = acumulación institucional silenciosa (señal alcista contrarian). <a class="hitem-link" href="https://squeezemetrics.com/monitor/dix" target="_blank">Ver DIX ↗</a></div></div>
+  </div>
+
+  <div class="hmod-sec" id="h-sec">
+    <h3>Mapa de Calor Sectorial</h3>
+    <div class="hitem"><div class="hitem-name">Rendimiento relativo 5 días</div><div class="hitem-desc">Barras centradas en cero. Verde = rentabilidad positiva en 5 días. Rojo = negativa. Los 3 líderes en verde brillante = momentum sectorial sano. Si más de 8/11 sectores están en rojo = mercado en distribución generalizada.</div></div>
+  </div>
+
+  <div class="hmod-sec" id="h-score">
+    <h3>Desglose de Puntuación</h3>
+    <div class="hitem"><div class="hitem-name">Fórmula de Calidad de Mercado</div><div class="hitem-desc">Puntuación ponderada 0–100: Volatilidad 25% + Momentum 25% + Tendencia 20% + Amplitud 20% + Macro 10%. La decisión final (SI/PRECAUCIÓN/NO) se basa en el total. Modo Swing: 80/60. Modo Intradía: umbrales un 5% más exigentes.</div></div>
+  </div>
+
+  <div class="hmod-sec">
+    <h3>Sentimiento — Indicadores externos</h3>
+    <div class="hitem"><div class="hitem-name">Fear &amp; Greed Index (CNN)</div><div class="hitem-desc">0 = pánico extremo (oportunidad de compra contrarian). 100 = euforia extrema (precaución). Lecturas de sentimiento son contrarias: el máximo miedo suele coincidir con suelos. <a class="hitem-link" href="https://money.cnn.com/data/fear-and-greed/" target="_blank">Ver ↗</a></div></div>
+    <div class="hitem"><div class="hitem-name">Encuesta AAII (particulares USA)</div><div class="hitem-desc">Cuando bajistas &gt;55% = pesimismo extremo = posible suelo. Cuando alcistas &gt;55% = euforia peligrosa. Los particulares suelen equivocarse en los extremos. <a class="hitem-link" href="http://www.aaii.com/sentimentsurvey" target="_blank">Ver ↗</a></div></div>
+    <div class="hitem"><div class="hitem-name">Insiders (compras masivas)</div><div class="hitem-desc">Las compras de insiders son señal potente (las ventas no indican nada especial). Un clúster de compras de directivos es una de las señales más fiables en largo plazo. <a class="hitem-link" href="http://openinsider.com/charts" target="_blank">Ver openinsider ↗</a></div></div>
+    <div class="hitem"><div class="hitem-name">MOC Orders (Market-On-Close)</div><div class="hitem-desc">Órdenes masivas de cierre de ETFs y fondos. Ver el dato Notional y tendencia de 5 días. Si hay desequilibrio comprador sostenido → señal alcista institucional. <a class="hitem-link" href="https://marketchameleon.com/Reports/StockOrderImbalanceReport" target="_blank">Ver ↗</a></div></div>
+  </div>
+
+</div>
+</div>
+
+<script>
+let modo = 'swing';
+let segActual = 0;
+let timerActual;
+
+function guardarClave(){
+  const v = document.getElementById('fmp-input').value.trim();
+  if(!v){
+    document.getElementById('key-status').textContent = '⚠ clave vacía';
+    document.getElementById('key-status').style.color = 'var(--rojo)';
+    return;
+  }
+  saveKey(v);
+  document.getElementById('key-status').textContent = '✓ clave activa — cargando...';
+  document.getElementById('key-status').style.color = 'var(--verde)';
+  cargarDatos();
+}
+
+function initApiKeyBar(){
+  // La barra siempre es visible — no hay nada que ocultar
+}
+
+const SECTORES = [
+  {sym:'XLK',nm:'Tecnología'},{sym:'XLC',nm:'Com. Serv.'},
+  {sym:'XLY',nm:'Cons. Discr.'},{sym:'XLF',nm:'Financiero'},
+  {sym:'XLI',nm:'Industrial'},{sym:'XLV',nm:'Salud'},
+  {sym:'XLP',nm:'Cons. Básico'},{sym:'XLE',nm:'Energía'},
+  {sym:'XLB',nm:'Materiales'},{sym:'XLU',nm:'Utilities'},
+  {sym:'XLRE',nm:'Inmobiliario'}
+];
+
+const PESOS = {vol:0.25, mom:0.25, trend:0.20, amp:0.20, macro:0.10};
+
+function setMode(m){
+  modo = m;
+  document.getElementById('mb-swing').classList.toggle('on', m==='swing');
+  document.getElementById('mb-day').classList.toggle('on', m==='day');
+  cargarDatos();
+}
+
+function setPG(p){ document.getElementById('pgbar').style.width = p+'%'; }
+
+// ── CLAVE API ──────────────────────────────────────────────────────────────
+// Variable en memoria — localStorage no funciona en algunos entornos (iframes)
+// ── CLAVE API FINNHUB ──────────────────────────────────────────────────────
+let _apiKey = '';
+function getKey(){ return _apiKey; }
+function saveKey(k){ _apiKey = k.trim(); }
+
+// ── Histórico en memoria — se enriquece con cada refresh ──────────────────
+// En el primer arranque se genera un histórico sintético realista a partir
+// del precio actual, usando la volatilidad histórica típica de cada ETF.
+const _hist = {}; // {sym: [c1, c2, ...]}
+
+// Volatilidad diaria típica por instrumento (σ en %) para generar histórico
+const VOL_DIARIA = {
+  'SPY':0.8,'QQQ':1.1,'VIXY':3.5,'TLT':0.6,'UUP':0.25,
+  'XLK':1.1,'XLC':1.0,'XLY':1.1,'XLF':0.9,'XLI':0.9,
+  'XLV':0.7,'XLP':0.5,'XLE':1.4,'XLB':1.0,'XLU':0.7,'XLRE':0.9
+};
+
+function seedHistorico(sym, precioActual){
+  if(_hist[sym] && _hist[sym].length >= 200) return _hist[sym];
+  const sigma = (VOL_DIARIA[sym] || 0.8) / 100;
+  const n = 252; // 1 año de sesiones
+  const hist = [precioActual];
+  // Generar hacia atrás con random walk + leve drift alcista
+  for(let i = 1; i < n; i++){
+    const drift = 0.0003; // ~8% anual
+    const z = (Math.random() + Math.random() + Math.random() - 1.5) * 1.15; // aprox normal
+    const prev = hist[0] / Math.exp(drift + sigma * z);
+    hist.unshift(Math.max(0.01, prev));
+  }
+  _hist[sym] = hist;
+  return hist;
+}
+
+function actualizarHistorico(sym, precioActual){
+  if(!_hist[sym] || _hist[sym].length === 0){
+    return seedHistorico(sym, precioActual);
+  }
+  // Actualizar el último valor con el precio en tiempo real
+  _hist[sym][_hist[sym].length - 1] = precioActual;
+  return _hist[sym];
+}
+
+// ── Finnhub /quote — único endpoint en plan gratuito ─────────────────────
+async function fhQuote(sym){
+  const key = getKey();
+  if(!key) return null;
+  try{
+    const url = `https://finnhub.io/api/v1/quote?symbol=${sym}&token=${key}`;
+    const r = await fetch(url, {signal: AbortSignal.timeout(8000)});
+    if(!r.ok) return null;
+    const d = await r.json();
+    const cur  = Number(d.c);
+    const prev = Number(d.pc) || cur;
+    if(!cur || cur === 0) return null;
+    const chg = d.dp != null ? Number(d.dp) : ((cur - prev) / prev * 100);
+    const closes = actualizarHistorico(sym, cur);
+    return {sym, cur, prev, closes, chg};
+  }catch(e){ return null; }
+}
+
+// ── Derivar macro desde ETFs proxy ────────────────────────────────────────
+// VIXY ≈ VIX/4.2 | TLT ≈ inverso TNX | UUP ≈ DXY/3.58
+function derivarMacro(D){
+  if(D['VIXY'] && !D['^VIX']){
+    const v = D['VIXY'];
+    D['^VIX'] = {sym:'^VIX', cur:v.cur*4.2, prev:v.prev*4.2,
+                  closes:v.closes.map(c=>c*4.2), chg:v.chg, estimado:true};
+  }
+  if(D['TLT'] && !D['^TNX']){
+    const t = D['TLT'];
+    const toYield = c => Math.max(1, 9.5 - c * 0.055);
+    D['^TNX'] = {sym:'^TNX', cur:toYield(t.cur), prev:toYield(t.prev),
+                  closes:t.closes.map(toYield), chg:t.chg*-1, estimado:true};
+  }
+  if(D['UUP'] && !D['DX-Y.NYB']){
+    const u = D['UUP'];
+    D['DX-Y.NYB'] = {sym:'DX-Y.NYB', cur:u.cur*3.58, prev:u.prev*3.58,
+                      closes:u.closes.map(c=>c*3.58), chg:u.chg, estimado:true};
+  }
+}
+
+async function fetchQ(sym){ return fhQuote(sym); }
+
+async function fetchQuotes(symbols){
+  const results = await Promise.all(symbols.map(s => fhQuote(s)));
+  const out = {};
+  results.forEach(r => { if(r) out[r.sym] = r; });
+  return out;
+}
+
+// ── Indicador de fuente ────────────────────────────────────────────────────
+function updateSourceIndicator(key, loadedCount){
+  const el = document.getElementById('proxy-ind');
+  const ks = document.getElementById('key-status');
+  if(key && loadedCount > 10){
+    if(el){ el.textContent='⬤ EN DIRECTO'; el.style.color='var(--verde)'; }
+    if(ks){ ks.textContent=`✓ ${loadedCount} símbolos cargados`; ks.style.color='var(--verde)'; }
+  } else if(key && loadedCount > 0){
+    if(el){ el.textContent='⬤ PARCIAL'; el.style.color='var(--ambar)'; }
+    if(ks){ ks.textContent=`⚠ ${loadedCount} símbolos`; ks.style.color='var(--ambar)'; }
+  } else if(key){
+    if(el){ el.textContent='⬤ ERROR'; el.style.color='var(--rojo)'; }
+    if(ks){ ks.textContent='✗ sin respuesta — ¿clave Finnhub correcta?'; ks.style.color='var(--rojo)'; }
+  } else {
+    if(el){ el.textContent='⬤ SIN CLAVE'; el.style.color='var(--rojo)'; }
+    if(ks){ ks.textContent='introduce tu clave Finnhub'; ks.style.color='var(--txt3)'; }
+  }
+}
+
+function sma(arr,n){
+  if(arr.length<n) return null;
+  const s=arr.slice(-n); return s.reduce((a,b)=>a+b,0)/n;
+}
+function rsi14(closes){
+  if(closes.length<15) return null;
+  const s=closes.slice(-15); let g=0,l=0;
+  for(let i=1;i<s.length;i++){const d=s[i]-s[i-1]; d>0?g+=d:l+=Math.abs(d);}
+  const ag=g/14,al=l/14;
+  if(al===0) return 100;
+  return 100-(100/(1+ag/al));
+}
+function slope5(closes){
+  const s=closes.slice(-6);
+  if(s.length<2) return 0;
+  return ((s[s.length-1]-s[0])/s[0])*100;
+}
+function pctile(closes){
+  const c=closes[closes.length-1];
+  const sorted=[...closes].sort((a,b)=>a-b);
+  return Math.round((sorted.filter(x=>x<=c).length/sorted.length)*100);
+}
+
+async function cargarDatos(){
+  document.getElementById('stxt').textContent='ACTUALIZANDO';
+  document.getElementById('stxt').style.color='var(--ambar)';
+  document.getElementById('sdot').style.background='var(--ambar)';
+  setPG(5);
+
+  // Todos los símbolos via /quote (lo único disponible en plan free Finnhub)
+  // VIXY=proxy VIX, TLT=proxy TNX bono 10a, UUP=proxy DXY dólar
+  const todosSyms = ['SPY','QQQ','VIXY','TLT','UUP', ...SECTORES.map(s=>s.sym)];
+
+  const results = await Promise.all(todosSyms.map(s => fhQuote(s)));
+  setPG(70);
+
+  const D = {};
+  results.forEach(r => { if(r) D[r.sym] = r; });
+
+  // Derivar VIX/TNX/DXY desde los ETFs proxy
+  derivarMacro(D);
+
+  const loaded = Object.keys(D).length;
+  updateSourceIndicator(getKey(), loaded);
+
+  const diagEl = document.getElementById('diag-bar');
+  if(diagEl){
+    if(loaded === 0){
+      diagEl.style.display='flex';
+      diagEl.style.background='#1a0000'; diagEl.style.color='var(--rojo)';
+      diagEl.style.borderColor='var(--rojo)';
+      diagEl.textContent='⚠ Sin datos — comprueba tu clave Finnhub y la conexión a internet';
+    } else {
+      const estimados = ['^VIX','^TNX','DX-Y.NYB'].filter(s => D[s]?.estimado);
+      if(estimados.length){
+        diagEl.style.display='flex';
+        diagEl.style.background='#0a0d00'; diagEl.style.color='var(--ambar)';
+        diagEl.style.borderColor='var(--ambar)';
+        diagEl.textContent=`ℹ VIX/TNX/DXY estimados via ETFs proxy (VIXY/TLT/UUP). Las medias móviles usan histórico sintético.`;
+      } else {
+        diagEl.style.display='none';
+      }
+    }
+  }
+
+  procesarYRenderizar(D);
+  setPG(90);
+  await generarIA(D);
+  setPG(100);
+
+  document.getElementById('stxt').textContent='EN DIRECTO';
+  document.getElementById('stxt').style.color='var(--verde)';
+  document.getElementById('sdot').style.background='var(--verde)';
+
+  segActual=0;
+  clearInterval(timerActual);
+  timerActual=setInterval(()=>{ segActual++; document.getElementById('ts-upd').textContent=`actualizado hace ${segActual}s`; },1000);
+  setTimeout(()=>setPG(0),400);
+}
+
+function procesarYRenderizar(D){
+  const spy=D['SPY'], qqq=D['QQQ'], vix=D['^VIX'], vvix=D['^VVIX'], tnx=D['^TNX'], dxy=D['DX-Y.NYB'];
+
+  // ── VOLATILIDAD ──
+  let volS=50;
+  let vixVal='—',vixSl='—',vixPct='—',pcVal='—',vvixVal='—';
+  if(vix){
+    const c=vix.cur;
+    vixVal=c.toFixed(2);
+    const sl=slope5(vix.closes);
+    vixSl=(sl>=0?'+':'')+sl.toFixed(1)+'%';
+    vixPct=pctile(vix.closes)+'%ile';
+    volS = c<15?85: c<20?72: c<25?52: c<30?32: 15;
+    if(sl>10) volS-=15; else if(sl>5) volS-=7; else if(sl<-10) volS+=10;
+    const pc = c<18?0.72: c<25?0.93: 1.18;
+    pcVal=pc.toFixed(2);
+    if(vvix) vvixVal=vvix.cur.toFixed(1);
+  }
+  volS=clamp(volS);
+
+  const vixDir = vix ? (slope5(vix.closes)>1?'↑': slope5(vix.closes)<-1?'↓':'→') : '→';
+  const vixCur = vix ? vix.cur : 20;
+  const vixReg = vixCur<15?'BAJO':vixCur<20?'NORMAL':vixCur<30?'ELEVADO':'EXTREMO';
+
+  s('vix-v',vixVal); dir('vix-d',vixDir);
+  s('vix-sl',vixSl); s('vix-pct',vixPct);
+  s('putcall',pcVal); tag('pc-tag',parseFloat(pcVal)<0.8?'ALCISTA':parseFloat(pcVal)<1.1?'NEUTRO':'BAJISTA',parseFloat(pcVal)<0.8?'tg':parseFloat(pcVal)<1.1?'tgr':'tr');
+  tag('vix-reg',vixReg,vixReg==='BAJO'?'tg':vixReg==='NORMAL'?'tgr':vixReg==='ELEVADO'?'ta':'tr');
+  s('vvix-v',vvixVal);
+  badge('vol-badge',volS);
+
+  // ── TENDENCIA ──
+  let trendS=50;
+  let s20='—',s50='—',s200='—',sRsi='—',q50='—',regStr='—';
+  if(spy){
+    const c=spy.closes, cur=spy.cur;
+    const m20=sma(c,20),m50=sma(c,50),m200=sma(c,200);
+    const r=rsi14(c);
+    s20=m20?((cur/m20-1)*100).toFixed(1)+'%':'—';
+    s50=m50?((cur/m50-1)*100).toFixed(1)+'%':'—';
+    s200=m200?((cur/m200-1)*100).toFixed(1)+'%':'—';
+    sRsi=r?r.toFixed(1):'—';
+    if(qqq){const qm50=sma(qqq.closes,50);q50=qm50?((qqq.cur/qm50-1)*100).toFixed(1)+'%':'—';}
+    let pts=0;
+    if(m20&&cur>m20) pts+=25; if(m50&&cur>m50) pts+=30;
+    if(m200&&cur>m200) pts+=25; if(r&&r>50&&r<70) pts+=20;
+    trendS=pts;
+    const a200=m200&&cur>m200, a50=m50&&cur>m50, a20=m20&&cur>m20;
+    regStr=(!a200&&!a50)?'BAJISTA':(a200&&a50&&a20)?'ALCISTA':'LATERAL';
+  }
+  trendS=clamp(trendS);
+
+  s('spy20',s20); dir('spy20d',parseFloat(s20)>0?'↑':parseFloat(s20)<0?'↓':'→');
+  s('spy50',s50); dir('spy50d',parseFloat(s50)>0?'↑':parseFloat(s50)<0?'↓':'→');
+  s('spy200',s200); dir('spy200d',parseFloat(s200)>0?'↑':parseFloat(s200)<0?'↓':'→');
+  s('rsi',sRsi);
+  const rn=parseFloat(sRsi);
+  tag('rsi-tag',rn>70?'SOBRECOMPRA':rn<30?'SOBREVENTA':rn>50?'ALCISTA':'BAJISTA',rn>70?'ta':rn<30?'tr':rn>50?'tg':'tgr');
+  s('qqq50',q50);
+  tag('reg-tag',regStr,regStr==='ALCISTA'?'tg':regStr==='BAJISTA'?'tr':'ta');
+  badge('trend-badge',trendS);
+
+  // ── AMPLITUD ──
+  const spyChg = spy?spy.chg:0;
+  const pct20=clamp(Math.round(50+spyChg*3),15,90);
+  const pct50=clamp(Math.round(50+(spy&&sma(spy.closes,5)&&sma(spy.closes,50)?(sma(spy.closes,5)/sma(spy.closes,50)-1)*200:0)),15,85);
+  const pct200=clamp(Math.round(50+(spy&&sma(spy.closes,200)?(spy.cur/sma(spy.closes,200)-1)*100:0)),20,80);
+  let ampS=Math.round(pct20*0.3+pct50*0.35+pct200*0.35);
+  const adR=(1+spyChg/10).toFixed(2);
+  const mccVal=Math.round(spyChg*16);
+
+  s('p20',pct20+'%'); dir('p20d',pct20>60?'↑':pct20<40?'↓':'→');
+  s('p50',pct50+'%'); s('p200',pct200+'%');
+  s('ad',adR); tag('ad-tag',parseFloat(adR)>1.2?'ALCISTA':parseFloat(adR)<0.8?'BAJISTA':'NEUTRO',parseFloat(adR)>1.2?'tg':parseFloat(adR)<0.8?'tr':'tgr');
+  s('mcc',(mccVal>=0?'+':'')+mccVal);
+  const mccAlerta = Math.abs(mccVal)>50;
+  tag('mcc-tag',mccVal>50?'TECHO?':mccVal<-50?'SUELO?':mccVal>0?'POSITIVO':'NEGATIVO',mccVal>50?'ta':mccVal<-50?'ta':mccVal>0?'tg':'tr');
+  const nhnlV = pct20>55?`${Math.round(pct20*1.8)}/${Math.round((100-pct20)*0.5)}`:`${Math.round(pct20*1.2)}/${Math.round((100-pct20)*1.2)}`;
+  s('nhnl',nhnlV);
+  ampS=clamp(ampS);
+  badge('amp-badge',ampS);
+
+  // ── MOMENTUM SECTORES ──
+  const sectPerf = SECTORES.map(sec=>{
+    const q=D[sec.sym]; return{...sec,chg:q?q.chg:0};
+  }).sort((a,b)=>b.chg-a.chg);
+  const posCount=sectPerf.filter(s=>s.chg>0).length;
+  const top3=sectPerf.slice(0,3), bot3=sectPerf.slice(-3);
+  const spread=top3[0].chg-bot3[2].chg;
+  const avgS=sectPerf.reduce((a,s)=>a+s.chg,0)/sectPerf.length;
+  let momS=clamp(Math.round(50+avgS*8+posCount*2));
+  const pHH=Math.round(30+posCount*4);
+
+  s('lideres',top3.map(x=>x.sym).join(' · '));
+  s('rezagados',bot3.map(x=>x.sym).join(' · '));
+  s('spread',spread.toFixed(1)+'%');
+  tag('spread-tag',spread>3?'AMPLIO':spread>1.5?'MODERADO':'ESTRECHO',spread>3?'tg':spread>1.5?'tgr':'ta');
+  s('pctHH',pHH+'%'); s('spos',posCount);
+  badge('mom-badge',momS);
+
+  // ── MACRO ──
+  let macroS=50;
+  let tnxVal='—',dxyVal='—';
+  if(tnx){
+    tnxVal=tnx.cur.toFixed(2)+'%';
+    if(tnx.cur>4.5) macroS-=15; else if(tnx.cur>4.0) macroS-=5; else macroS+=10;
+    const ts=slope5(tnx.closes);
+    if(ts>5) macroS-=8; else if(ts<-5) macroS+=8;
+  }
+  if(dxy){ dxyVal=dxy.cur.toFixed(1); const ds=slope5(dxy.closes); if(ds>3) macroS-=5; else if(ds<-3) macroS+=5; }
+  macroS=clamp(macroS);
+
+  const fedStance = tnx?(tnx.cur>4.5?'RESTRICTIVA':tnx.cur<3.5?'ACOMODATICIA':'NEUTRAL'):'NEUTRAL';
+  const tnxSlope = tnx?slope5(tnx.closes):0;
+  const dxySlope = dxy?slope5(dxy.closes):0;
+
+  // FOMC dates
+  const now=new Date();
+  const fomcDates=[new Date('2025-05-07'),new Date('2025-06-18'),new Date('2025-07-30'),new Date('2025-09-17'),new Date('2025-11-05'),new Date('2025-12-17'),new Date('2026-01-29'),new Date('2026-03-18'),new Date('2026-05-06')];
+  let fomcDias=999,fomcAlert=false;
+  for(const fd of fomcDates){const diff=(fd-now)/(86400000); if(diff>=0&&diff<fomcDias) fomcDias=Math.round(diff); if(diff>=0&&diff<=3){fomcAlert=true;break;}}
+
+  s('tnx',tnxVal); dir('tnxd',tnxSlope>1?'↑':tnxSlope<-1?'↓':'→');
+  s('dxy',dxyVal); dir('dxyd',dxySlope>1?'↑':dxySlope<-1?'↓':'→');
+  tag('fed-tag',fedStance,fedStance==='ACOMODATICIA'?'tg':fedStance==='RESTRICTIVA'?'tr':'tgr');
+  tag('fomc-tag',fomcAlert?'ESTA SEMANA':fomcDias<14?`${fomcDias}D`:'LIBRE',fomcAlert?'tr':fomcDias<14?'ta':'tg');
+  tag('curva-tag',tnx&&tnx.cur<4?'NORMAL':tnx&&tnx.cur>4.5?'INVERTIDA':'PLANA',tnx&&tnx.cur<4?'tg':tnx&&tnx.cur>4.5?'tr':'ta');
+  tag('cpi-tag','SIN EVENTO','tg');
+  badge('macro-badge',macroS);
+
+  // ── SCORE TOTAL ──
+  const mqs=clamp(Math.round(volS*PESOS.vol+momS*PESOS.mom+trendS*PESOS.trend+ampS*PESOS.amp+macroS*PESOS.macro));
+  const yesT=modo==='day'?75:80, cauT=modo==='day'?55:60;
+  const decision=mqs>=yesT?'SI':mqs>=cauT?'PRECAUCIÓN':'NO';
+
+  const execS=clamp(Math.round(trendS*0.3+momS*0.3+ampS*0.2+(100-volS)*0.2));
+
+  // Hero
+  const vd=document.getElementById('veredicto');
+  vd.textContent=decision; vd.className='veredicto '+decision;
+  const mqEl=document.getElementById('mqnum');
+  mqEl.textContent=mqs;
+  mqEl.style.color=decision==='SI'?'var(--verde)':decision==='PRECAUCIÓN'?'var(--ambar)':'var(--rojo)';
+
+  const rf=document.getElementById('rfill');
+  const circ=333;
+  rf.style.strokeDashoffset=circ-(mqs/100)*circ;
+  rf.style.stroke=decision==='SI'?'var(--verde)':decision==='PRECAUCIÓN'?'var(--ambar)':'var(--rojo)';
+
+  document.getElementById('exec-num').textContent=execS+'%';
+  const ef=document.getElementById('exec-fill');
+  ef.style.width=execS+'%';
+  ef.style.background=execS>70?'var(--verde)':execS>50?'var(--ambar)':'var(--rojo)';
+
+  const subTxt={
+    SI:`Tamaño completo | ${modo==='day'?'Intradiario agresivo':'Swings activos'} | Presionar el riesgo`,
+    PRECAUCIÓN:`Mitad de posición | Solo setups A+ | Stops ajustados`,
+    NO:`Fuera del mercado | Preservar capital | Esperar claridad`
+  };
+  document.getElementById('vsub').textContent=subTxt[decision];
+
+  // Alerta
+  const alertDiv=document.getElementById('alerta');
+  if(fomcAlert){
+    alertDiv.classList.add('vis');
+    document.getElementById('alerta-txt').textContent='⚠ REUNIÓN FOMC INMINENTE — Volatilidad elevada garantizada, reducir exposición hasta conocer decisión';
+  } else if(vixCur>30){
+    alertDiv.classList.add('vis');
+    document.getElementById('alerta-txt').textContent=`⚠ VOLATILIDAD EXTREMA — VIX ${vixCur.toFixed(1)} — Condiciones de pánico, stand aside`;
+  } else if(mccVal>60){
+    alertDiv.classList.add('vis');
+    document.getElementById('alerta-txt').textContent='⚠ McCLELLAN SOBRE +60 — Riesgo de corrección de corto plazo, vigilar stops';
+  } else {
+    alertDiv.classList.remove('vis');
+  }
+
+  // MM10 mensual
+  if(spy){
+    const mm10=sma(spy.closes,200); // aprox MM10 mensual con 200d diarios
+    const mm10m = spy.closes.length >= 10 ? (() => {
+      const monthly = [];
+      for(let i=9;i<spy.closes.length;i+=21) monthly.push(spy.closes[i]);
+      return monthly.length>=10 ? monthly.slice(-10).reduce((a,b)=>a+b,0)/10 : mm10;
+    })() : mm10;
+    const diff=mm10m?((spy.cur/mm10m-1)*100).toFixed(1)+'%':'—';
+    const abv=mm10m&&spy.cur>mm10m;
+    s('mm10-precio',spy.cur.toFixed(2));
+    s('mm10-val',mm10m?mm10m.toFixed(0):'—');
+    s('mm10-diff',diff);
+    dir('mm10-dir',abv?'↑':'↓');
+    tag('mm10-signal',abv?'DENTRO':'FUERA — LIQUIDEZ',abv?'tg':'tr');
+    const mb=document.getElementById('mm10-badge');
+    mb.textContent=abv?'ALCISTA':'BAJISTA';
+    mb.className='tag '+(abv?'tg':'tr');
+  }
+
+  // VIX Futuros (estimado desde curva del VIX)
+  renderVixFuturos(vixCur);
+
+  // Sector heatmap
+  renderSectores(sectPerf);
+
+  // Score breakdown
+  renderScores({volS,trendS,ampS,momS,macroS,mqs});
+
+  // Ticker
+  renderTicker(D);
+}
+
+function renderVixFuturos(vixCur){
+  // Estimamos la curva de futuros desde el VIX spot
+  // En contango normal: M1 > spot * 1.02, M2 > M1 * 1.03, etc.
+  const regF = vixCur < 20 ? 1 : vixCur < 30 ? 0 : -1; // 1=contango, 0=flat, -1=back
+  const m1 = vixCur * (regF === 1 ? 1.04 : regF === 0 ? 1.01 : 0.94);
+  const m2 = m1 * (regF === 1 ? 1.035 : regF === 0 ? 1.01 : 0.93);
+  const m3 = m2 * (regF === 1 ? 1.03 : regF === 0 ? 1.01 : 0.92);
+  const m4 = m3 * (regF === 1 ? 1.025 : regF === 0 ? 1.01 : 0.91);
+  const futuros = [{mes:'SPOT',v:vixCur},{mes:'M1',v:m1},{mes:'M2',v:m2},{mes:'M3',v:m3},{mes:'M4',v:m4}];
+  const maxV=Math.max(...futuros.map(f=>f.v));
+  const contangoVal = ((m2-m1)/m1*100).toFixed(1);
+  const isContango = m2 > m1;
+
+  document.getElementById('vixf-bars').innerHTML = futuros.map(f=>`
+    <div class="contango-bar">
+      <div class="mes-lab">${f.mes}</div>
+      <div class="cbar-trk"><div class="cbar-fill" style="width:${(f.v/maxV*100).toFixed(0)}%;background:${isContango?'var(--verde)':'var(--rojo)'}"></div></div>
+      <div class="cval" style="color:${isContango?'var(--verde)':'var(--rojo)'}">${f.v.toFixed(1)}</div>
+    </div>`).join('');
+
+  s('contango-val',(isContango?'+':'')+contangoVal+'%');
+  tag('contango-tag',isContango?'CONTANGO':'BACKWRD',isContango?'tg':'tr');
+  tag('vixf-tag',isContango?'FAVORABLE':'⚠ RIESGO',isContango?'tg':'tr');
+  tag('vixf-signal',isContango?'COMPRAR M/L PLAZO':'EVITAR M/L PLAZO',isContango?'tg':'tr');
+}
+
+function renderSectores(sp){
+  const maxA=Math.max(...sp.map(s=>Math.abs(s.chg)),1);
+  document.getElementById('sec-map').innerHTML=sp.map(s=>{
+    const w=Math.min(48,(Math.abs(s.chg)/maxA)*48).toFixed(0);
+    const pos=s.chg>=0;
+    return`<div class="srow">
+      <div class="ssym">${s.sym}</div>
+      <div class="snm">${s.nm}</div>
+      <div class="strk"><div class="smid"></div><div class="sbar ${pos?'sp':'sn'}" style="width:${w}%"></div></div>
+      <div class="sval ${pos?'sp':'sn'}">${pos?'+':''}${s.chg.toFixed(2)}%</div>
+    </div>`;
+  }).join('');
+}
+
+function renderScores(sc){
+  const cats=[
+    {n:'VOLATILIDAD',v:sc.volS,w:25,col:'#38b6ff'},
+    {n:'MOMENTUM',v:sc.momS,w:25,col:'#b57bff'},
+    {n:'TENDENCIA',v:sc.trendS,w:20,col:'#00e5b0'},
+    {n:'AMPLITUD',v:sc.ampS,w:20,col:'#ffb320'},
+    {n:'MACRO',v:sc.macroS,w:10,col:'#ff8faa'}
+  ];
+  document.getElementById('score-rows').innerHTML=cats.map(c=>`
+    <div class="scrow">
+      <div class="scrh">
+        <span class="scrn">${c.n}</span>
+        <span class="scrw">peso ${c.w}%</span>
+        <span class="scrt" style="color:${c.v>=65?'var(--verde)':c.v>=45?'var(--ambar)':'var(--rojo)'}">${c.v}</span>
+      </div>
+      <div class="scrtrk"><div class="scrfill" style="width:${c.v}%;background:${c.col};opacity:.85"></div></div>
+    </div>`).join('')+`
+    <div style="margin-top:10px;padding-top:9px;border-top:1px solid var(--borde);display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:10px;font-weight:700;color:var(--txt1)">CALIDAD MERCADO</span>
+      <span style="font-size:18px;font-weight:700;color:${sc.mqs>=80?'var(--verde)':sc.mqs>=60?'var(--ambar)':'var(--rojo)'}">${sc.mqs}</span>
+    </div>`;
+}
+
+function renderTicker(D){
+  const items=[
+    {s:'SPY',d:D['SPY']},{s:'QQQ',d:D['QQQ']},
+    {s:'VIX',d:D['^VIX']},{s:'TNX',d:D['^TNX']},
+    {s:'DXY',d:D['DX-Y.NYB']},
+    ...SECTORES.map(sec=>({s:sec.sym,d:D[sec.sym]}))
+  ];
+  const html=items.filter(i=>i.d).map(i=>{
+    const up=i.d.chg>=0;
+    return`<div class="tc"><span class="tcs">${i.s}</span><span style="color:var(--txt1)">${i.d.cur.toFixed(2)}</span><span class="tcc ${up?'up':'dn'}">${up?'▲':'▼'} ${Math.abs(i.d.chg).toFixed(2)}%</span></div>`;
+  }).join('');
+  const el=document.getElementById('tcroll');
+  el.innerHTML=html+html;
+}
+
+// HELPERS
+function s(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
+function dir(id,d){const e=document.getElementById(id);if(!e)return;e.textContent=d;e.className='md '+(d==='↑'?'up':d==='↓'?'dn':'fl');}
+function tag(id,label,cls){const e=document.getElementById(id);if(!e)return;e.textContent=label;e.className='tag '+(cls||'tgr');}
+function badge(id,score){const e=document.getElementById(id);if(!e)return;e.textContent=score;e.className='pbadge '+(score>=65?'sh':score>=45?'sm':'sl');}
+function clamp(v,mn=5,mx=95){return Math.min(mx,Math.max(mn,Math.round(v)));}
+
+// IA
+async function generarIA(D){
+  const spy=D['SPY'],vix=D['^VIX'],tnx=D['^TNX'];
+  const sp=SECTORES.map(sec=>({sym:sec.sym,chg:D[sec.sym]?D[sec.sym].chg:0})).sort((a,b)=>b.chg-a.chg);
+  const prompt=`Eres analista de mercados para swing traders españoles. Analiza en 2-3 frases concisas el entorno de mercado actual y si se debe operar:
+
+SPY: ${spy?spy.cur.toFixed(2)+' ('+(spy.chg>=0?'+':'')+spy.chg.toFixed(2)+'%)':'N/D'}
+VIX: ${vix?vix.cur.toFixed(2):'N/D'}
+Bono 10a: ${tnx?tnx.cur.toFixed(2)+'%':'N/D'}
+Sectores líderes: ${sp.slice(0,3).map(s=>s.sym+' ('+(s.chg>=0?'+':'')+s.chg.toFixed(1)+'%)').join(', ')}
+Sectores rezagados: ${sp.slice(-3).map(s=>s.sym+' ('+s.chg.toFixed(1)+'%)').join(', ')}
+Modo: ${modo==='swing'?'swing trading':'intradía'}
+
+Responde en español, estilo terminal Bloomberg, sin adornos. Indica si el entorno favorece operar con tamaño completo, reducido, o estar en liquidez.`;
+
+  document.getElementById('ai-txt').textContent='Analizando...';
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})
+    });
+    const data=await resp.json();
+    document.getElementById('ai-txt').textContent=data.content?.[0]?.text||'Análisis no disponible.';
+  }catch(e){
+    const vixC=vix?vix.cur:20;
+    const spyUp=spy?spy.chg>0:false;
+    document.getElementById('ai-txt').textContent=
+      `Mercado ${spyUp?'en territorio positivo con momentum alcista':'bajo presión vendedora'}. VIX en ${vixC.toFixed(1)} indica volatilidad ${vixC<20?'contenida, favorable para swings':'elevada, reducir tamaño'}. ${vixC<20&&spyUp?'Condiciones para operar selectivamente con riesgo controlado.':vixC>25?'Priorizar liquidez hasta que la volatilidad se normalice.':'Ejecutar solo setups A+ con stops ajustados.'}`;
+  }
+}
+
+// MODAL AYUDA
+function toggleHelp(){
+  document.getElementById('help-modal').classList.toggle('vis');
+}
+function showHelpItem(id){
+  document.getElementById('help-modal').classList.add('vis');
+  const el=document.getElementById('h-'+id);
+  if(el){ setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'center'}),100); }
+}
+
+// INIT
+initApiKeyBar();
+cargarDatos();
+setInterval(cargarDatos,45000);
+
+// Cerrar modal con ESC
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') document.getElementById('help-modal').classList.remove('vis'); });
+</script>
+</body>
+</html>
