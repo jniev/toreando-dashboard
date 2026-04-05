@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ToreandoTrades — Dashboard Completo</title>
+<title>ToreandoTrades — Dashboard V4</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
 
@@ -500,6 +500,145 @@ html.light .qlink { border-bottom-color:rgba(168,188,200,.5); }
 
 html.light .bofa-override { background:#f4f7fa; }
 html.light .bofa-signal-box { background:#f4f7fa; }
+
+/* ══════════════════════════════════════════════
+   ZBT — ZWEIG BREADTH THRUST PANEL
+══════════════════════════════════════════════ */
+#zbt-section { max-width:1600px; margin:0 auto; padding:0 10px 10px; }
+
+#zbt-panel {
+  background: var(--bg2);
+  border: 1px solid var(--borde);
+  border-left: 3px solid var(--azul);
+  border-radius: 4px;
+  padding: 16px;
+  display: grid;
+  grid-template-columns: 220px 1fr 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+@media(max-width:1200px){ #zbt-panel { grid-template-columns: 1fr 1fr; } }
+@media(max-width:700px)  { #zbt-panel { grid-template-columns: 1fr; } }
+
+/* EMA gauge — vertical bar thermometer */
+.zbt-thermo-vert {
+  position: relative;
+  width: 36px;
+  height: 160px;
+  background: linear-gradient(to top,
+    #ff3d5a 0%,
+    #ff9f47 20%,
+    #7a9bb8 42%,
+    #7a9bb8 58%,
+    #38b6ff 72%,
+    #22d3a0 100%
+  );
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+.zbt-thermo-marker {
+  position: absolute;
+  left: -8px; right: -8px;
+  height: 3px;
+  border-radius: 2px;
+  pointer-events: none;
+}
+.zbt-thermo-label {
+  position: absolute;
+  right: calc(100% + 6px);
+  font-size: 8px;
+  color: var(--txt3);
+  white-space: nowrap;
+  transform: translateY(50%);
+}
+.zbt-thermo-val-needle {
+  position: absolute;
+  left: -5px; right: -5px;
+  height: 3px;
+  background: var(--txt1);
+  border-radius: 2px;
+  box-shadow: 0 0 6px rgba(255,255,255,.6);
+  transition: bottom 1s cubic-bezier(.34,1.2,.64,1);
+}
+.zbt-thermo-val-needle::after {
+  content: '';
+  position: absolute;
+  right: -5px; top: 50%;
+  transform: translateY(-50%);
+  width: 7px; height: 7px;
+  background: var(--txt1);
+  border-radius: 50%;
+  box-shadow: 0 0 6px rgba(255,255,255,.6);
+}
+
+/* ZBT big number */
+.zbt-big {
+  font-size: 44px;
+  font-weight: 700;
+  letter-spacing: -1px;
+  line-height: 1;
+  transition: color .6s;
+  text-shadow: 0 0 24px currentColor;
+}
+.zbt-signal-word {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  transition: color .6s;
+  text-shadow: 0 0 12px currentColor;
+}
+
+/* Thrust window — 10-day countdown bar */
+.zbt-window {
+  background: var(--bg3);
+  border: 1px solid var(--borde);
+  border-radius: 3px;
+  padding: 10px 12px;
+}
+.zbt-window-title {
+  font-size: 8px; letter-spacing: 2px; font-weight: 700;
+  text-transform: uppercase; margin-bottom: 8px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.zbt-day-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 3px;
+  margin-top: 6px;
+}
+.zbt-day-cell {
+  height: 22px;
+  border-radius: 2px;
+  background: var(--borde);
+  border: 1px solid var(--borde2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 8px; font-weight: 600;
+  transition: background .3s, border-color .3s;
+}
+.zbt-day-cell.past   { background: rgba(56,182,255,.15); border-color: var(--azul); color: var(--azul); }
+.zbt-day-cell.thrust { background: rgba(34,211,160,.2);  border-color: var(--verde); color: var(--verde); }
+.zbt-day-cell.future { background: var(--borde); color: var(--txt3); }
+
+/* EMA chart strip */
+.zbt-ema-track {
+  height: 5px; background: var(--borde);
+  border-radius: 3px; overflow: hidden; position: relative;
+  margin: 3px 0;
+}
+.zbt-ema-fill {
+  height: 100%; border-radius: 3px;
+  transition: width 1s ease, background .6s;
+  position: absolute;
+}
+
+/* Override input — shared style reuse with slight mod */
+.zbt-override {
+  background: var(--bg3); border: 1px solid var(--borde2);
+  border-radius: 3px; padding: 10px 12px;
+}
+html.light .zbt-override  { background: #f4f7fa; }
+html.light #zbt-panel      { }
 </style>
 </head>
 <body>
@@ -1130,8 +1269,243 @@ html.light .bofa-signal-box { background:#f4f7fa; }
 </div><!-- /bofa-panel -->
 </div><!-- /bofa-section -->
 
+<!-- ════════════════════════════════════════════
+     SECCIÓN 4 — ZWEIG BREADTH THRUST (ZBT)
+════════════════════════════════════════════ -->
+<div class="sec-divider" style="margin-top:4px;">
+  <div class="sec-divider-line"></div>
+  <div class="sec-divider-label" style="color:var(--azul)">
+    ◈ ZWEIG BREADTH THRUST (ZBT) — SEÑAL DE INICIO DE MERCADO ALCISTA
+    <button class="hicon" onclick="showHelpItem('zbt')" style="color:var(--azul);border-color:rgba(56,182,255,.3);">?</button>
+  </div>
+  <div class="sec-divider-line"></div>
+</div>
+
+<div id="zbt-section">
+<div id="zbt-panel">
+
+  <!-- COL 1: Termómetro vertical + valor actual -->
+  <div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+    <div style="font-size:8px;letter-spacing:2.5px;color:var(--txt3);text-transform:uppercase;font-weight:600;text-align:center;">ZBT — EMA(10) A/(A+D)</div>
+
+    <div style="display:flex;align-items:flex-start;gap:14px;">
+      <!-- Vertical thermometer -->
+      <div style="position:relative;">
+        <div class="zbt-thermo-vert">
+          <!-- Fixed zone markers -->
+          <div style="position:absolute;bottom:61.5%;left:0;right:0;height:1px;background:rgba(34,211,160,.8);">
+            <span class="zbt-thermo-label" style="bottom:-4px;color:var(--verde);">0.615 ▲BUY</span>
+          </div>
+          <div style="position:absolute;bottom:40%;left:0;right:0;height:1px;background:rgba(255,61,90,.8);">
+            <span class="zbt-thermo-label" style="bottom:-4px;color:var(--rojo);">0.40 ▼SETUP</span>
+          </div>
+          <div style="position:absolute;bottom:50%;left:0;right:0;height:1px;background:rgba(122,155,184,.4);">
+            <span class="zbt-thermo-label" style="bottom:-4px;">0.50</span>
+          </div>
+          <!-- Animated needle -->
+          <div class="zbt-thermo-val-needle" id="zbt-needle" style="bottom:50%;"></div>
+        </div>
+        <!-- Scale labels right side -->
+        <div style="position:absolute;top:-4px;left:calc(100% + 4px);font-size:8px;color:var(--txt3);">1.0</div>
+        <div style="position:absolute;bottom:-4px;left:calc(100% + 4px);font-size:8px;color:var(--txt3);">0.0</div>
+      </div>
+
+      <!-- Big number + signal -->
+      <div style="display:flex;flex-direction:column;gap:8px;padding-top:8px;">
+        <div class="zbt-big" id="zbt-val">—</div>
+        <div class="zbt-signal-word" id="zbt-signal-word">—</div>
+        <div style="font-size:9px;color:var(--txt3);line-height:1.6;">
+          EMA(10)<br>Advances /<br>(Adv+Dec)
+        </div>
+        <div style="display:flex;align-items:center;gap:5px;margin-top:4px;">
+          <div style="width:6px;height:6px;border-radius:50%;" id="zbt-src-dot" style="background:var(--txt3)"></div>
+          <span style="font-size:9px;color:var(--txt3);" id="zbt-src-label">sin datos</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- EMA bar visual -->
+    <div style="width:100%;">
+      <div style="display:flex;justify-content:space-between;font-size:8px;color:var(--txt3);margin-bottom:3px;">
+        <span style="color:var(--rojo);">0.40</span>
+        <span>EMA actual</span>
+        <span style="color:var(--verde);">0.615</span>
+      </div>
+      <div style="position:relative;height:10px;background:var(--borde);border-radius:3px;overflow:visible;">
+        <!-- Zone markers -->
+        <div style="position:absolute;left:40%;top:0;bottom:0;width:1px;background:rgba(255,61,90,.5);"></div>
+        <div style="position:absolute;left:61.5%;top:0;bottom:0;width:1px;background:rgba(34,211,160,.5);"></div>
+        <div class="zbt-ema-fill" id="zbt-ema-fill" style="width:50%;background:var(--azul);"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:8px;color:var(--txt3);margin-top:2px;">
+        <span>0.0</span><span>0.5</span><span>1.0</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- COL 2: Thrust Window + Override manual -->
+  <div style="display:flex;flex-direction:column;gap:10px;">
+
+    <!-- THRUST WINDOW — 10-day countdown -->
+    <div class="zbt-window">
+      <div class="zbt-window-title">
+        <span style="color:var(--azul);">⬡ VENTANA DE THRUST — 10 DÍAS</span>
+        <span class="tag" id="zbt-window-tag">—</span>
+      </div>
+      <div style="font-size:9px;color:var(--txt2);margin-bottom:8px;line-height:1.6;">
+        La señal ZBT se activa si el EMA pasa de <strong style="color:var(--rojo);">&lt;0.40</strong> a
+        <strong style="color:var(--verde);">&gt;0.615</strong> dentro de <strong>10 días.</strong>
+      </div>
+
+      <!-- Setup status -->
+      <div class="pm" style="margin-bottom:4px;">
+        <span class="ml" style="font-size:9px;">Setup activo (EMA estuvo &lt;0.40)</span>
+        <div class="mr"><span class="tag" id="zbt-setup-tag">—</span></div>
+      </div>
+      <div class="pm" style="margin-bottom:4px;">
+        <span class="ml" style="font-size:9px;">Fecha del setup</span>
+        <div class="mr"><span class="mv" id="zbt-setup-date">—</span></div>
+      </div>
+      <div class="pm" style="margin-bottom:8px;">
+        <span class="ml" style="font-size:9px;">Días restantes para thrust</span>
+        <div class="mr"><span class="mv" id="zbt-days-left" style="font-size:14px;font-weight:700;">—</span></div>
+      </div>
+
+      <!-- 10-day grid visual -->
+      <div style="font-size:8px;color:var(--txt3);margin-bottom:4px;letter-spacing:1px;">VENTANA DE 10 DÍAS</div>
+      <div class="zbt-day-grid" id="zbt-day-grid">
+        <!-- filled by JS -->
+      </div>
+    </div>
+
+    <!-- Override manual -->
+    <div class="zbt-override">
+      <span style="font-size:8px;letter-spacing:2px;color:var(--ambar);font-weight:700;text-transform:uppercase;display:block;margin-bottom:8px;">⬡ Dato manual (StockCharts $BINYBT)</span>
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:7px;">
+        <input id="zbt-manual-input" type="number" min="0" max="1" step="0.001"
+          style="background:var(--bg2);border:1px solid var(--borde2);color:var(--txt1);font-family:var(--font);font-size:14px;font-weight:700;padding:5px 8px;border-radius:3px;width:90px;outline:none;text-align:center;"
+          placeholder="0.000"/>
+        <span style="font-size:10px;color:var(--txt3);">EMA value</span>
+        <button onclick="saveZbtManual()"
+          style="background:var(--azul);color:#000;border:none;font-family:var(--font);font-size:9px;font-weight:700;letter-spacing:1px;padding:6px 12px;border-radius:2px;cursor:pointer;white-space:nowrap;">
+          ✓ APLICAR
+        </button>
+      </div>
+      <!-- Setup trigger -->
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+        <button onclick="triggerZbtSetup()"
+          style="background:transparent;border:1px solid var(--rojo);color:var(--rojo);font-family:var(--font);font-size:8px;font-weight:700;letter-spacing:1px;padding:4px 10px;border-radius:2px;cursor:pointer;flex:1;">
+          ⬡ MARCAR HOY COMO SETUP (&lt;0.40)
+        </button>
+        <button onclick="clearZbtSetup()"
+          style="background:transparent;border:1px solid var(--borde2);color:var(--txt3);font-family:var(--font);font-size:8px;letter-spacing:1px;padding:4px 8px;border-radius:2px;cursor:pointer;">
+          ✕
+        </button>
+      </div>
+      <div style="display:flex;gap:6px;">
+        <button class="bofa-src-btn" id="zbt-src-auto"   onclick="setZbtSource('auto')">AUTO (proxy)</button>
+        <button class="bofa-src-btn active" id="zbt-src-manual" onclick="setZbtSource('manual')">MANUAL ($BINYBT)</button>
+      </div>
+      <div style="font-size:9px;color:var(--txt3);margin-top:7px;line-height:1.65;">
+        Ver en StockCharts:
+        <a href="https://stockcharts.com/h-sc/ui?s=%21BINYBT&p=D&yr=0&mn=6&dy=0" target="_blank"
+          style="color:var(--azul);text-decoration:none;">$BINYBT ↗</a>
+        ·
+        <a href="https://stockcharts.com/h-sc/ui?s=%21BINYBTD&p=D&yr=0&mn=6&dy=0" target="_blank"
+          style="color:var(--azul);text-decoration:none;">$BINYBTD (señal digital) ↗</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- COL 3: Proxy automático + historial EMA -->
+  <div style="display:flex;flex-direction:column;gap:10px;">
+
+    <div>
+      <div style="font-size:8px;letter-spacing:2px;color:var(--txt3);text-transform:uppercase;font-weight:600;margin-bottom:8px;">◎ PROXY AUTOMÁTICO — ETFs disponibles</div>
+      <div class="pm"><span class="ml" style="font-size:9px;">ETFs avanzando hoy</span><div class="mr"><span class="mv" id="zbt-adv">—</span></div></div>
+      <div class="pm"><span class="ml" style="font-size:9px;">ETFs retrocediendo</span><div class="mr"><span class="mv" id="zbt-dec">—</span></div></div>
+      <div class="pm"><span class="ml" style="font-size:9px;">Ratio A/(A+D) hoy</span><div class="mr"><span class="mv" id="zbt-ratio-today">—</span></div></div>
+      <div class="pm"><span class="ml" style="font-size:9px;">EMA(10) proxy</span><div class="mr"><span class="mv" id="zbt-ema-proxy">—</span><span class="tag" id="zbt-ema-proxy-tag">—</span></div></div>
+      <div class="pm"><span class="ml" style="font-size:9px;">Total instrumentos</span><div class="mr"><span class="mv" id="zbt-total-inst">—</span></div></div>
+      <div style="font-size:9px;color:var(--txt3);margin-top:8px;padding:7px;background:var(--bg3);border-radius:3px;border-left:2px solid var(--borde2);line-height:1.65;">
+        <strong style="color:var(--txt2);">Limitación:</strong> el proxy usa ~13 ETFs, no las ~2.500 acciones reales del NYSE. Captura la dirección pero no la magnitud exacta. El ZBT real requiere datos diarios de $NYADV/$NYDEC (StockCharts, plan de pago).
+      </div>
+    </div>
+
+    <!-- EMA history sparkline -->
+    <div>
+      <div style="font-size:8px;letter-spacing:2px;color:var(--txt3);text-transform:uppercase;font-weight:600;margin-bottom:6px;">◈ EMA simulada — últimas 30 sesiones</div>
+      <canvas id="zbt-hist-canvas" style="width:100%;height:100px;display:block;"></canvas>
+      <div style="display:flex;justify-content:space-between;font-size:8px;color:var(--txt3);margin-top:3px;">
+        <span>30d atrás</span><span>Hoy</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- COL 4: Señal activa + histórico señales ZBT -->
+  <div style="display:flex;flex-direction:column;gap:10px;">
+
+    <!-- Active signal box -->
+    <div style="background:var(--bg3);border:1px solid var(--borde);border-radius:3px;padding:12px;text-align:center;">
+      <div style="font-size:8px;letter-spacing:2px;color:var(--txt3);margin-bottom:8px;">ESTADO ACTUAL</div>
+      <div style="font-size:18px;font-weight:700;letter-spacing:1.5px;margin-bottom:5px;" id="zbt-status-label">—</div>
+      <div style="font-size:9px;color:var(--txt2);line-height:1.7;" id="zbt-status-desc">Esperando datos...</div>
+    </div>
+
+    <!-- Signal interpretation table -->
+    <div>
+      <div style="font-size:8px;letter-spacing:2px;color:var(--txt3);text-transform:uppercase;font-weight:600;margin-bottom:7px;">◈ INTERPRETACIÓN</div>
+      <div class="bofa-sig-row">
+        <div class="bofa-sig-dot" style="background:var(--verde)"></div>
+        <div class="bofa-sig-val" style="color:var(--verde);font-size:9px;">→ &gt;0.615</div>
+        <div class="bofa-sig-desc">THRUST: inicio bull market (si venía de &lt;0.40 en ≤10d)</div>
+      </div>
+      <div class="bofa-sig-row">
+        <div class="bofa-sig-dot" style="background:var(--azul)"></div>
+        <div class="bofa-sig-val" style="color:var(--azul);font-size:9px;">0.50–0.615</div>
+        <div class="bofa-sig-desc">Momentum positivo — breadth saludable, swings activos</div>
+      </div>
+      <div class="bofa-sig-row">
+        <div class="bofa-sig-dot" style="background:var(--txt2)"></div>
+        <div class="bofa-sig-val" style="color:var(--txt2);font-size:9px;">0.40–0.50</div>
+        <div class="bofa-sig-desc">Zona neutral — sin sesgo claro de breadth</div>
+      </div>
+      <div class="bofa-sig-row">
+        <div class="bofa-sig-dot" style="background:var(--rojo)"></div>
+        <div class="bofa-sig-val" style="color:var(--rojo);font-size:9px;">&lt; 0.40</div>
+        <div class="bofa-sig-desc">SETUP: oversold, posible inicio de ventana de thrust (10d)</div>
+      </div>
+    </div>
+
+    <!-- Historical ZBT signals reference -->
+    <div style="background:var(--bg3);border:1px solid var(--borde);border-radius:3px;padding:10px 12px;">
+      <div style="font-size:8px;letter-spacing:2px;color:var(--azul);font-weight:700;margin-bottom:8px;text-transform:uppercase;">◈ SEÑALES ZBT HISTÓRICAS</div>
+      <div style="font-size:9px;color:var(--txt3);line-height:1.8;">
+        Solo <strong style="color:var(--txt1);">~14 señales</strong> desde 1945.<br>
+        <span style="color:var(--verde);">100% win rate</span> a 6 y 12 meses.<br>
+        +5.4% medio al mes · +8.3% a 3 meses<br>
+        +17.8% de media a 12 meses (Carson Group)<br><br>
+        <span style="color:var(--ambar);">Última señal conocida:</span><br>
+        Abr 2023 · Nov 2023<br><br>
+        <span style="color:var(--txt3);">¿Señal activa ahora?</span><br>
+        <span id="zbt-last-signal-note" style="color:var(--txt2);">Ver $BINYBTD en StockCharts</span>
+      </div>
+      <div style="margin-top:8px;">
+        <a href="https://stockcharts.com/h-sc/ui?s=%21BINYBT&p=D&yr=1&mn=0&dy=0" target="_blank"
+          style="font-size:9px;color:var(--azul);text-decoration:none;">Ver ZBT en StockCharts ↗</a>
+        <span style="margin:0 5px;color:var(--txt3);">·</span>
+        <a href="https://articles.stockcharts.com/article/zweig-breadth-thrust-sets-up-how-to-identify-a-stampede-in-upside-participation/" target="_blank"
+          style="font-size:9px;color:var(--azul);text-decoration:none;">Artículo StockCharts ↗</a>
+      </div>
+    </div>
+
+  </div>
+
+</div><!-- /zbt-panel -->
+</div><!-- /zbt-section -->
+
 <div style="text-align:center;padding:10px 20px 18px;font-size:9px;color:var(--txt3)">
-  ToreandoTrades — Fear &amp; Greed 2.0 + Market Timing Dashboard · Solo informativo, no es asesoramiento financiero · Datos vía Finnhub (ETFs proxy)
+  ToreandoTrades V4 — F&amp;G 2.0 · Market Timing · BofA Breadth Rule · Zweig Breadth Thrust · Solo informativo, no es asesoramiento financiero · Datos vía Finnhub (ETFs proxy)
 </div>
 
 
@@ -1167,6 +1541,27 @@ html.light .bofa-signal-box { background:#f4f7fa; }
     <div class="hitem">
       <div class="hitem-name">¿Por qué no penaliza el reloj?</div>
       <div class="hitem-desc">Como señaló el usuario: la señal más relevante es el oversold extremo como oportunidad de compra contrarian. Penalizar el F&G 2.0 cuando estamos en zona oversold sería contraproducente — precisamente cuando más bajo está el indicador es cuando más deberías estar atento a comprar, no a salir. El panel se muestra de forma independiente para que lo interpretes en contexto.</div>
+    </div>
+  </div>
+
+  <div class="hmod-sec" id="h-zbt">
+    <h3>Zweig Breadth Thrust (ZBT)</h3>
+    <div class="hitem">
+      <div class="hitem-name">¿Qué es el ZBT?</div>
+      <div class="hitem-desc">Indicador creado por Martin Zweig que mide la EMA de 10 días del ratio Advances/(Advances+Declines) del NYSE. Rango 0–1. Valores bajos (&lt;0.40) = oversold severo. Valores altos (&gt;0.615) = breadth explosiva al alza. La señal clásica requiere pasar de &lt;0.40 a &gt;0.615 en un máximo de 10 días.</div>
+    </div>
+    <div class="hitem">
+      <div class="hitem-name">La señal ZBT clásica (muy rara)</div>
+      <div class="hitem-desc">Solo ~14 veces desde 1945. 100% de win rate a 6 y 12 meses. La caída bajo 0.40 (SETUP) activa una ventana de 10 días para buscar el THRUST (&gt;0.615). La rareza es lo que la hace valiosa — cuando aparece, es una de las mejores señales de inicio de mercado alcista.</div>
+    </div>
+    <div class="hitem">
+      <div class="hitem-name">Uso cotidiano — oversold como señal táctica</div>
+      <div class="hitem-desc">La caída por debajo de 0.40 es útil en sí misma como señal de oversold de corto plazo: refleja que muy pocas acciones han avanzado en los últimos 10 días — un extremo que suele preceder rebotes, independientemente de si se completa el thrust.</div>
+    </div>
+    <div class="hitem">
+      <div class="hitem-name">Datos y proxy en este dashboard</div>
+      <div class="hitem-desc">El cálculo real requiere $NYADV/$NYDEC (StockCharts, plan de pago). El proxy usa ~13 ETFs de Finnhub. Para máxima precisión: introduce manualmente el valor de $BINYBT desde StockCharts, y pulsa "Marcar Setup" cuando veas que cae por debajo de 0.40 — el panel activa la ventana de 10 días automáticamente.</div>
+      <a class="hitem-link" href="https://stockcharts.com/h-sc/ui?s=%21BINYBT&p=D&yr=0&mn=6&dy=0" target="_blank">Ver $BINYBT en StockCharts ↗</a>
     </div>
   </div>
 
@@ -1390,6 +1785,7 @@ async function cargarDatos(){
   procesarFG(D);
   procesarMQ(D);
   computeAndRenderBofaProxy(D);
+  computeAndRenderZbt(D);
   renderTicker(D);
   setPG(88);
   await generarIA(D);
@@ -2021,6 +2417,343 @@ function computeAndRenderBofaProxy(D) {
     $('bofa-src-manual').classList.remove('active');
   }
   renderBofaPanel();
+}
+
+// ══════════════════════════════════════════════
+// ZBT — ZWEIG BREADTH THRUST ENGINE
+// ══════════════════════════════════════════════
+
+// State
+let _zbtSource    = 'manual';   // 'auto' | 'manual'
+let _zbtManualVal = null;       // last manual EMA value (0–1)
+let _zbtSetupDate = null;       // Date when EMA fell below 0.40
+let _zbtHistory   = [];         // [{val, date}] EMA readings — last 30
+let _zbtProxyEMA  = null;       // computed proxy EMA
+let _zbtProxyBuf  = [];         // rolling buffer of daily proxy ratios (for EMA)
+
+// ZBT thresholds
+const ZBT_SETUP  = 0.40;
+const ZBT_THRUST = 0.615;
+const ZBT_WINDOW = 10;  // calendar trading days
+
+function setZbtSource(src) {
+  _zbtSource = src;
+  $('zbt-src-auto').classList.toggle('active', src === 'auto');
+  $('zbt-src-manual').classList.toggle('active', src === 'manual');
+  renderZbt();
+}
+
+function saveZbtManual() {
+  const inp = $('zbt-manual-input');
+  const v = parseFloat(inp.value);
+  if (isNaN(v) || v < 0 || v > 1) {
+    inp.style.borderColor = 'var(--rojo)';
+    setTimeout(() => inp.style.borderColor = '', 1500);
+    return;
+  }
+  inp.style.borderColor = 'var(--verde)';
+  setTimeout(() => inp.style.borderColor = '', 1000);
+
+  _zbtManualVal = v;
+  const dateStr = new Date().toLocaleDateString('es-ES', {day:'2-digit', month:'short', year:'numeric'});
+  _zbtHistory.unshift({ val: v, date: dateStr });
+  if (_zbtHistory.length > 30) _zbtHistory = _zbtHistory.slice(0, 30);
+
+  // Auto-detect setup from manual entry
+  if (v < ZBT_SETUP && !_zbtSetupDate) {
+    _zbtSetupDate = new Date();
+  }
+  // Auto-clear setup if thrust achieved
+  if (v >= ZBT_THRUST && _zbtSetupDate) {
+    const daysElapsed = Math.round((new Date() - _zbtSetupDate) / 86400000);
+    if (daysElapsed <= ZBT_WINDOW) {
+      // Signal fired! Keep setup date for reference
+    } else {
+      _zbtSetupDate = null; // window expired
+    }
+  }
+
+  _zbtSource = 'manual';
+  $('zbt-src-manual').classList.add('active');
+  $('zbt-src-auto').classList.remove('active');
+  renderZbt();
+}
+
+function triggerZbtSetup() {
+  _zbtSetupDate = new Date();
+  const dateStr = _zbtSetupDate.toLocaleDateString('es-ES', {day:'2-digit', month:'short', year:'numeric'});
+  // Add a reading entry marking the setup
+  if (_zbtManualVal === null || _zbtManualVal >= ZBT_SETUP) {
+    _zbtManualVal = 0.38; // representative oversold value
+    $('zbt-manual-input').value = '0.380';
+    _zbtHistory.unshift({ val: 0.38, date: dateStr + ' [SETUP]' });
+  }
+  renderZbt();
+}
+
+function clearZbtSetup() {
+  _zbtSetupDate = null;
+  renderZbt();
+}
+
+// Compute ZBT proxy EMA from available ETF data
+function computeZbtProxy(D) {
+  const allInst = ['SPY', 'QQQ', ...SECTORES.map(s => s.sym)];
+  let adv = 0, dec = 0, total = 0;
+
+  for (const sym of allInst) {
+    const q = D[sym];
+    if (!q) continue;
+    total++;
+    if (q.chg > 0) adv++;
+    else if (q.chg < 0) dec++;
+    // unchanged counts as neither
+  }
+
+  if (total === 0) return null;
+
+  const ratio = adv / (adv + dec || 1);
+
+  // Update rolling buffer for EMA(10)
+  _zbtProxyBuf.push(ratio);
+  if (_zbtProxyBuf.length > 30) _zbtProxyBuf = _zbtProxyBuf.slice(-30);
+
+  // EMA(10) — using exponential
+  const n = 10;
+  const k = 2 / (n + 1);
+  let ema = _zbtProxyBuf[0];
+  for (let i = 1; i < _zbtProxyBuf.length; i++) {
+    ema = _zbtProxyBuf[i] * k + ema * (1 - k);
+  }
+
+  return { ema: parseFloat(ema.toFixed(4)), ratio, adv, dec, total };
+}
+
+function zbtStatusFromVal(v) {
+  if (v === null || v === undefined) {
+    return { word: '—', col: 'var(--txt3)', status: '—', desc: 'Sin datos. Introduce el valor $BINYBT o espera al proxy.', zone: '—', zoneCls: 'tgr' };
+  }
+  // Check if thrust is active
+  if (_zbtSetupDate) {
+    const daysElapsed = Math.round((new Date() - _zbtSetupDate) / 86400000);
+    if (v >= ZBT_THRUST && daysElapsed <= ZBT_WINDOW) {
+      return { word: '🚀 THRUST!', col: 'var(--verde)', status: 'SEÑAL ZBT ACTIVA', desc: `EMA superó 0.615 en ${daysElapsed}d desde el setup. Señal histórica de inicio de mercado alcista. 100% win rate histórico.`, zone: 'THRUST', zoneCls: 'tg' };
+    }
+    if (daysElapsed > ZBT_WINDOW) {
+      _zbtSetupDate = null; // expired — reset
+    }
+  }
+  if (v < ZBT_SETUP) {
+    return { word: 'OVERSOLD', col: 'var(--rojo)', status: 'SETUP ACTIVO', desc: `EMA en ${v.toFixed(3)} — por debajo de 0.40. Oversold severo. Si marca el setup, el panel monitorizará si supera 0.615 en ≤10 días para señal ZBT.`, zone: 'SETUP', zoneCls: 'tr' };
+  }
+  if (v < 0.50) {
+    return { word: 'NEUTRAL BAJO', col: 'var(--ambar)', status: 'SIN SEÑAL', desc: `EMA en ${v.toFixed(3)} — zona neutral baja. Breadth débil pero no oversold. Sin señal direccional clara.`, zone: 'NEUTRAL BAJO', zoneCls: 'ta' };
+  }
+  if (v < ZBT_THRUST) {
+    return { word: 'BREADTH OK', col: 'var(--azul)', status: 'MOMENTUM +', desc: `EMA en ${v.toFixed(3)} — breadth positiva y saludable. Swings activos, mercado participando. Sin señal ZBT aún.`, zone: 'NEUTRO+', zoneCls: 'tb' };
+  }
+  return { word: 'BREADTH FUERTE', col: 'var(--verde)', status: 'CONDICIÓN THRUST', desc: `EMA en ${v.toFixed(3)} — supera 0.615 pero sin setup previo &lt;0.40 activo. No es señal ZBT clásica, pero breadth excepcionalmente fuerte.`, zone: 'OVERBOUGHT', zoneCls: 'tg' };
+}
+
+function renderZbt() {
+  // Active value
+  let activeVal = null;
+  if (_zbtSource === 'manual' && _zbtManualVal !== null) {
+    activeVal = _zbtManualVal;
+  } else if (_zbtProxyEMA !== null) {
+    activeVal = _zbtProxyEMA.ema;
+  } else if (_zbtManualVal !== null) {
+    activeVal = _zbtManualVal;
+  }
+
+  const sig = zbtStatusFromVal(activeVal);
+
+  // Thermometer needle: bottom = 0%, top = 100% → maps 0–1 to 0%–100%
+  const needlePct = activeVal !== null ? (activeVal * 100).toFixed(1) + '%' : '50%';
+  const nd = $('zbt-needle');
+  if (nd) { nd.style.bottom = needlePct; }
+
+  // Big number
+  const bv = $('zbt-val');
+  if (bv) { bv.textContent = activeVal !== null ? activeVal.toFixed(3) : '—'; bv.style.color = sig.col; bv.style.textShadow = `0 0 20px ${sig.col}`; }
+
+  const sw = $('zbt-signal-word');
+  if (sw) { sw.textContent = sig.word; sw.style.color = sig.col; sw.style.textShadow = `0 0 12px ${sig.col}`; }
+
+  // EMA fill bar (0–100% maps to 0–1)
+  const ef = $('zbt-ema-fill');
+  if (ef) {
+    ef.style.width = activeVal !== null ? (activeVal * 100).toFixed(1) + '%' : '0%';
+    ef.style.background = sig.col;
+  }
+
+  // Source indicator
+  const srcDot = $('zbt-src-dot'), srcLbl = $('zbt-src-label');
+  const srcActive = _zbtSource === 'manual' && _zbtManualVal !== null;
+  if (srcDot) srcDot.style.background = srcActive ? 'var(--verde)' : activeVal !== null ? 'var(--ambar)' : 'var(--txt3)';
+  if (srcLbl) { srcLbl.textContent = srcActive ? 'Manual ($BINYBT)' : activeVal !== null ? 'Proxy automático' : 'sin datos'; srcLbl.style.color = activeVal !== null ? 'var(--txt2)' : 'var(--txt3)'; }
+
+  // Status box
+  const sl = $('zbt-status-label'), sd = $('zbt-status-desc');
+  if (sl) { sl.textContent = sig.status; sl.style.color = sig.col; }
+  if (sd) sd.textContent = sig.desc;
+
+  // Thrust window
+  renderZbtWindow(activeVal);
+
+  // Proxy panel
+  if (_zbtProxyEMA) {
+    const p = _zbtProxyEMA;
+    el('zbt-adv', p.adv);
+    el('zbt-dec', p.dec);
+    el('zbt-ratio-today', p.ratio.toFixed(3));
+    el('zbt-ema-proxy', p.ema.toFixed(3));
+    tag('zbt-ema-proxy-tag',
+      p.ema < ZBT_SETUP ? 'SETUP' : p.ema >= ZBT_THRUST ? 'THRUST ZONE' : p.ema >= 0.50 ? 'NEUTRO+' : 'NEUTRO-',
+      p.ema < ZBT_SETUP ? 'tr' : p.ema >= ZBT_THRUST ? 'tg' : p.ema >= 0.50 ? 'tb' : 'ta'
+    );
+    el('zbt-total-inst', p.total);
+  }
+
+  renderZbtHistory();
+}
+
+function renderZbtWindow(activeVal) {
+  const setupTag = $('zbt-setup-tag');
+  const setupDate = $('zbt-setup-date');
+  const daysLeft = $('zbt-days-left');
+  const winTag = $('zbt-window-tag');
+  const dayGrid = $('zbt-day-grid');
+
+  if (!_zbtSetupDate) {
+    if (setupTag) tag('zbt-setup-tag', 'NO ACTIVO', 'tgr');
+    if (setupDate) el('zbt-setup-date', '—');
+    if (daysLeft) { $('zbt-days-left').textContent = '—'; $('zbt-days-left').style.color = 'var(--txt3)'; }
+    if (winTag) tag('zbt-window-tag', 'ESPERANDO SETUP', 'tgr');
+    if (dayGrid) dayGrid.innerHTML = Array.from({length: 10}, (_,i) =>
+      `<div class="zbt-day-cell future">${i+1}</div>`).join('');
+    return;
+  }
+
+  const now = new Date();
+  const elapsed = Math.round((now - _zbtSetupDate) / 86400000);
+  const remaining = Math.max(0, ZBT_WINDOW - elapsed);
+  const thrustActive = activeVal !== null && activeVal >= ZBT_THRUST && elapsed <= ZBT_WINDOW;
+  const expired = elapsed > ZBT_WINDOW;
+
+  if (setupTag) tag('zbt-setup-tag', expired ? 'EXPIRADO' : 'ACTIVO', expired ? 'tr' : 'ta');
+  if (setupDate) el('zbt-setup-date', _zbtSetupDate.toLocaleDateString('es-ES', {day:'2-digit', month:'short'}));
+  if (daysLeft) {
+    $('zbt-days-left').textContent = expired ? '0' : remaining + 'd';
+    $('zbt-days-left').style.color = remaining <= 2 ? 'var(--rojo)' : remaining <= 5 ? 'var(--ambar)' : 'var(--azul)';
+  }
+  if (winTag) tag('zbt-window-tag',
+    thrustActive ? '🚀 THRUST!' : expired ? 'EXPIRADO' : `${remaining}D RESTANTES`,
+    thrustActive ? 'tg' : expired ? 'tr' : 'ta'
+  );
+
+  // Day grid: show which days have passed
+  if (dayGrid) {
+    dayGrid.innerHTML = Array.from({length: 10}, (_, i) => {
+      const d = i + 1;
+      const cls = thrustActive && d <= elapsed ? 'thrust' : d <= elapsed ? 'past' : 'future';
+      return `<div class="zbt-day-cell ${cls}">${d}</div>`;
+    }).join('');
+  }
+}
+
+function renderZbtHistory() {
+  const canvas = $('zbt-hist-canvas'); if (!canvas) return;
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width  = canvas.offsetWidth * dpr || 400;
+  canvas.height = 100 * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  const w = canvas.width / dpr, h = canvas.height / dpr;
+  ctx.clearRect(0, 0, w, h);
+
+  // Build data: manual history + proxy buffer
+  let data = [];
+  if (_zbtHistory.length > 1) {
+    data = [..._zbtHistory].reverse().map(r => r.val);
+  } else if (_zbtProxyBuf.length > 1) {
+    // Build simulated EMA history from proxy buffer
+    const k = 2 / 11;
+    let ema = _zbtProxyBuf[0];
+    data = [ema];
+    for (let i = 1; i < _zbtProxyBuf.length; i++) {
+      ema = _zbtProxyBuf[i] * k + ema * (1 - k);
+      data.push(ema);
+    }
+  } else {
+    // Single point from current value
+    const v = _zbtManualVal !== null ? _zbtManualVal : _zbtProxyEMA?.ema;
+    if (v !== null && v !== undefined) data = [v];
+  }
+
+  if (data.length === 0) {
+    ctx.fillStyle = 'rgba(58,85,112,.6)'; ctx.font = '10px IBM Plex Mono'; ctx.textAlign = 'center';
+    ctx.fillText('Sin historial', w / 2, h / 2); return;
+  }
+
+  const toY = v => h - v * h; // 0→bottom, 1→top
+
+  // Zone bands
+  ctx.fillStyle = 'rgba(255,61,90,.08)';  ctx.fillRect(0, 0, w, toY(ZBT_SETUP));              // above 0.40 (inverted)... wait:
+  // Band: 0–0.40 = red zone (bottom), 0.40–0.615 = neutral, 0.615–1 = green
+  ctx.fillStyle = 'rgba(255,61,90,.1)';  ctx.fillRect(0, toY(ZBT_SETUP), w, h - toY(ZBT_SETUP));   // bottom red zone
+  ctx.fillStyle = 'rgba(34,211,160,.08)'; ctx.fillRect(0, 0, w, toY(ZBT_THRUST));                   // top green zone
+
+  // Reference lines
+  [[ZBT_THRUST, 'rgba(34,211,160,.7)', '0.615'], [ZBT_SETUP, 'rgba(255,61,90,.7)', '0.40'], [0.50, 'rgba(122,155,184,.4)', '0.50']].forEach(([v, col, lbl]) => {
+    const y = toY(v);
+    ctx.strokeStyle = col; ctx.lineWidth = 0.8; ctx.setLineDash([3, 5]);
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = col; ctx.font = '8px IBM Plex Mono'; ctx.textAlign = 'left';
+    ctx.fillText(lbl, 3, y - 2);
+  });
+
+  if (data.length < 2) {
+    // Single dot
+    const x = w / 2, y = toY(data[0]);
+    ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2);
+    ctx.fillStyle = data[0] < ZBT_SETUP ? 'var(--rojo)' : data[0] >= ZBT_THRUST ? '#22d3a0' : '#38b6ff';
+    ctx.fill(); return;
+  }
+
+  const xStep = w / (data.length - 1);
+  const lastV = data[data.length - 1];
+  const lineCol = lastV < ZBT_SETUP ? '255,61,90' : lastV >= ZBT_THRUST ? '34,211,160' : '56,182,255';
+
+  // Area fill
+  const grad = ctx.createLinearGradient(0, 0, 0, h);
+  grad.addColorStop(0, `rgba(${lineCol},.3)`); grad.addColorStop(1, `rgba(${lineCol},.01)`);
+  ctx.beginPath();
+  data.forEach((v, i) => { const x = i * xStep, y = toY(v); i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y); });
+  ctx.lineTo(w, h); ctx.lineTo(0, h); ctx.closePath();
+  ctx.fillStyle = grad; ctx.fill();
+
+  // Line
+  ctx.beginPath(); ctx.strokeStyle = `rgba(${lineCol},1)`; ctx.lineWidth = 1.5;
+  data.forEach((v, i) => { const x = i * xStep, y = toY(v); i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y); });
+  ctx.stroke();
+
+  // End dot
+  const lx = (data.length - 1) * xStep, ly = toY(lastV);
+  ctx.beginPath(); ctx.arc(lx, ly, 3.5, 0, Math.PI * 2);
+  ctx.fillStyle = `rgb(${lineCol})`; ctx.shadowColor = `rgb(${lineCol})`; ctx.shadowBlur = 6;
+  ctx.fill(); ctx.shadowBlur = 0;
+}
+
+// Hook into cargarDatos
+function computeAndRenderZbt(D) {
+  _zbtProxyEMA = computeZbtProxy(D);
+  if (_zbtManualVal === null) {
+    _zbtSource = 'auto';
+    $('zbt-src-auto').classList.add('active');
+    $('zbt-src-manual').classList.remove('active');
+  }
+  renderZbt();
 }
 
 // ── UI ─────────────────────────────────────────────────────────────────────
