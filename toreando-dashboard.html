@@ -366,6 +366,140 @@ html.light .qlink { border-bottom-color:rgba(168,188,200,.5); }
   #fg-panels,#paneles { grid-template-columns:repeat(2,1fr); }
   #fg-botrow,#fila4   { grid-template-columns:1fr; }
 }
+
+/* ══════════════════════════════════════════════
+   BOFA GLOBAL BREADTH RULE — PANEL INDEPENDIENTE
+══════════════════════════════════════════════ */
+#bofa-section {
+  max-width:1600px; margin:0 auto; padding:0 10px 10px;
+}
+#bofa-panel {
+  background:var(--bg2);
+  border:1px solid var(--borde);
+  border-left:3px solid var(--lima);
+  border-radius:4px;
+  padding:16px;
+  display:grid;
+  grid-template-columns:260px 1fr 1fr 220px;
+  gap:16px;
+  align-items:start;
+}
+@media(max-width:1200px){ #bofa-panel { grid-template-columns:1fr 1fr; } }
+@media(max-width:700px)  { #bofa-panel { grid-template-columns:1fr; } }
+
+/* Gauge circular BofA */
+.bofa-gauge-wrap {
+  display:flex; flex-direction:column; align-items:center; gap:10px;
+}
+.bofa-arc-wrap { position:relative; width:160px; height:90px; overflow:visible; }
+.bofa-arc-wrap svg { overflow:visible; }
+.bofa-center {
+  position:absolute; bottom:0; left:50%; transform:translateX(-50%);
+  text-align:center; white-space:nowrap;
+}
+.bofa-num { font-size:32px; font-weight:700; line-height:1; transition:color .6s; text-shadow:0 0 20px currentColor; }
+.bofa-sub { font-size:9px; color:var(--txt3); letter-spacing:1px; }
+.bofa-signal {
+  font-size:13px; font-weight:700; letter-spacing:2px;
+  text-transform:uppercase; text-align:center;
+  transition:color .6s; text-shadow:0 0 14px currentColor;
+}
+
+/* Termómetro horizontal */
+.bofa-thermo {
+  position:relative; width:100%; height:18px; border-radius:3px; overflow:visible;
+  background:linear-gradient(90deg,
+    #22d3a0 0%,      /* -100% extremo oversold = BUY */
+    #38b6ff 20%,     /* -60 */
+    #7a9bb8 40%,     /* -20 neutral bajo */
+    #7a9bb8 55%,     /* neutral */
+    #ffb320 70%,     /* +40 overbought approaching */
+    #ff3d5a 100%     /* +89 extreme overbought */
+  );
+  margin-bottom:4px;
+}
+.bofa-thermo-needle {
+  position:absolute; top:-5px; width:2px; height:28px;
+  background:var(--txt1); border-radius:1px;
+  transform:translateX(-50%);
+  transition:left 1s cubic-bezier(.34,1.2,.64,1);
+  box-shadow:0 0 6px rgba(255,255,255,.5);
+}
+.bofa-thermo-needle::after {
+  content:''; position:absolute; top:-3px; left:50%; transform:translateX(-50%);
+  width:6px; height:6px; background:var(--txt1); border-radius:50%;
+}
+/* zone markers */
+.bofa-thermo-zones {
+  position:relative; height:8px; margin-bottom:2px;
+}
+.bofa-zone-mark {
+  position:absolute; top:0; font-size:8px; color:var(--txt3);
+  transform:translateX(-50%); white-space:nowrap;
+}
+
+/* Override input */
+.bofa-override {
+  background:var(--bg3); border:1px solid var(--borde2);
+  border-radius:3px; padding:10px 12px;
+}
+.bofa-override-title {
+  font-size:8px; letter-spacing:2px; color:var(--ambar);
+  text-transform:uppercase; margin-bottom:8px; display:block; font-weight:700;
+}
+.bofa-input-row { display:flex; align-items:center; gap:6px; margin-bottom:7px; }
+.bofa-input {
+  background:var(--bg2); border:1px solid var(--borde2);
+  color:var(--txt1); font-family:var(--font); font-size:14px; font-weight:700;
+  padding:5px 8px; border-radius:3px; width:80px; outline:none;
+  text-align:center; transition:border-color .2s;
+}
+.bofa-input:focus { border-color:var(--lima); }
+.bofa-input-unit { font-size:11px; color:var(--txt3); }
+.bofa-save-btn {
+  background:var(--lima); color:#050810; border:none;
+  font-family:var(--font); font-size:9px; font-weight:700;
+  letter-spacing:1px; padding:6px 12px; border-radius:2px;
+  cursor:pointer; transition:opacity .15s; white-space:nowrap;
+}
+.bofa-save-btn:hover { opacity:.85; }
+.bofa-source-row {
+  display:flex; gap:6px; margin-bottom:6px;
+}
+.bofa-src-btn {
+  flex:1; background:transparent; border:1px solid var(--borde2);
+  color:var(--txt3); font-family:var(--font); font-size:8px;
+  letter-spacing:1px; padding:4px 6px; border-radius:2px;
+  cursor:pointer; transition:all .15s; text-align:center;
+}
+.bofa-src-btn.active { border-color:var(--azul); color:var(--azul); background:rgba(56,182,255,.08); }
+.bofa-src-btn:hover  { border-color:var(--txt2); color:var(--txt2); }
+.bofa-last-manual { font-size:9px; color:var(--txt3); line-height:1.6; }
+
+/* Proxy stats column */
+.bofa-proxy-col { display:flex; flex-direction:column; gap:0; }
+.bofa-proxy-title { font-size:8px; letter-spacing:2px; color:var(--txt3); text-transform:uppercase; margin-bottom:8px; font-weight:600; }
+
+/* History sparkline */
+.bofa-history-col { display:flex; flex-direction:column; gap:8px; }
+.bofa-hist-title { font-size:8px; letter-spacing:2px; color:var(--txt3); text-transform:uppercase; font-weight:600; }
+
+/* Signal box */
+.bofa-signal-box {
+  background:var(--bg3); border:1px solid var(--borde);
+  border-radius:3px; padding:9px 11px; margin-top:8px;
+}
+.bofa-sig-row {
+  display:flex; align-items:flex-start; gap:6px;
+  padding:4px 0; border-bottom:1px solid var(--borde);
+}
+.bofa-sig-row:last-child { border-bottom:none; }
+.bofa-sig-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; margin-top:3px; }
+.bofa-sig-val { font-size:9px; font-weight:700; width:60px; flex-shrink:0; }
+.bofa-sig-desc { font-size:9px; color:var(--txt2); line-height:1.5; flex:1; }
+
+html.light .bofa-override { background:#f4f7fa; }
+html.light .bofa-signal-box { background:#f4f7fa; }
 </style>
 </head>
 <body>
@@ -803,6 +937,199 @@ html.light .qlink { border-bottom-color:rgba(168,188,200,.5); }
 
 </div><!-- /s2-wrap -->
 
+<!-- ════════════════════════════════════════════
+     SECCIÓN 3 — BofA GLOBAL BREADTH RULE
+════════════════════════════════════════════ -->
+<div class="sec-divider" style="margin-top:4px;">
+  <div class="sec-divider-line"></div>
+  <div class="sec-divider-label" style="color:var(--lima)">◈ BofA GLOBAL BREADTH RULE — SEÑAL DE TIMING GLOBAL (PANEL INDEPENDIENTE) <button class="hicon" onclick="showHelpItem('bofa')" style="color:var(--lima);border-color:rgba(232,255,71,.3);">?</button></div>
+  <div class="sec-divider-line"></div>
+</div>
+
+<div id="bofa-section">
+<div id="bofa-panel">
+
+  <!-- COL 1: Gauge + señal principal -->
+  <div class="bofa-gauge-wrap">
+    <div style="font-size:8px;letter-spacing:2.5px;color:var(--txt3);text-transform:uppercase;font-weight:600;">BofA Breadth Reading</div>
+
+    <!-- Semicircle gauge -->
+    <div class="bofa-arc-wrap" style="width:180px;height:100px;">
+      <svg viewBox="0 0 180 100" width="180" height="100" style="overflow:visible;">
+        <!-- zone arcs: oversold (buy) left, neutral mid, overbought right -->
+        <path d="M15,95 A80,80 0 0,1 48,21"  fill="none" stroke="#22d3a0" stroke-width="9" stroke-linecap="round" opacity=".35"/>
+        <path d="M48,21 A80,80 0 0,1 90,11"  fill="none" stroke="#38b6ff" stroke-width="9" stroke-linecap="round" opacity=".25"/>
+        <path d="M90,11 A80,80 0 0,1 132,21" fill="none" stroke="#7a9bb8" stroke-width="9" stroke-linecap="round" opacity=".2"/>
+        <path d="M132,21 A80,80 0 0,1 165,95" fill="none" stroke="#ff3d5a" stroke-width="9" stroke-linecap="round" opacity=".35"/>
+        <!-- value arc -->
+        <path id="bofa-arc" d="M90,11 A80,80 0 0,1 90,11" fill="none" stroke="#38b6ff" stroke-width="9" stroke-linecap="round" style="transition:d 1s cubic-bezier(.34,1.2,.64,1),stroke .6s"/>
+        <!-- needle -->
+        <line id="bofa-needle" x1="90" y1="95" x2="90" y2="23" stroke="var(--txt1)" stroke-width="1.5" stroke-linecap="round" style="transition:transform 1s cubic-bezier(.34,1.2,.64,1);transform-origin:90px 95px"/>
+        <circle cx="90" cy="95" r="4.5" fill="var(--txt1)"/>
+        <!-- labels -->
+        <text x="6"   y="105" font-family="IBM Plex Mono" font-size="8" fill="#22d3a0" font-weight="600">-100</text>
+        <text x="80"  y="10"  font-family="IBM Plex Mono" font-size="8" fill="var(--txt3)">0</text>
+        <text x="155" y="105" font-family="IBM Plex Mono" font-size="8" fill="#ff3d5a" font-weight="600">+100</text>
+      </svg>
+      <div class="bofa-center">
+        <div class="bofa-num" id="bofa-num">—</div>
+        <div class="bofa-sub">NET %</div>
+      </div>
+    </div>
+
+    <!-- Thermometer bar -->
+    <div style="width:100%;padding:0 4px;">
+      <div class="bofa-thermo">
+        <div class="bofa-thermo-needle" id="bofa-needle-bar" style="left:50%"></div>
+        <!-- zone ticks -->
+        <div style="position:absolute;top:0;left:5%;width:1px;height:100%;background:rgba(255,255,255,.2)"></div>
+        <div style="position:absolute;top:0;left:50%;width:1px;height:100%;background:rgba(255,255,255,.3)"></div>
+        <div style="position:absolute;top:0;left:92%;width:1px;height:100%;background:rgba(255,255,255,.2)"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:8px;color:var(--txt3);margin-top:2px;">
+        <span style="color:var(--verde);font-weight:700">BUY -88</span>
+        <span>0</span>
+        <span style="color:var(--rojo);font-weight:700">SELL +89</span>
+      </div>
+    </div>
+
+    <div class="bofa-signal" id="bofa-signal-word">—</div>
+
+    <!-- Source badge -->
+    <div style="display:flex;align-items:center;gap:5px;margin-top:2px;">
+      <div style="width:6px;height:6px;border-radius:50%;background:var(--txt3)" id="bofa-src-dot"></div>
+      <span style="font-size:9px;color:var(--txt3)" id="bofa-src-label">sin datos</span>
+    </div>
+
+    <!-- Señal boxes -->
+    <div class="bofa-signal-box" style="width:100%">
+      <div class="bofa-sig-row">
+        <div class="bofa-sig-dot" style="background:var(--verde)"></div>
+        <div class="bofa-sig-val" style="color:var(--verde)">≤ −88%</div>
+        <div class="bofa-sig-desc">BUY signal histórico — compra agresiva, señal contrarian extrema</div>
+      </div>
+      <div class="bofa-sig-row">
+        <div class="bofa-sig-dot" style="background:var(--azul)"></div>
+        <div class="bofa-sig-val" style="color:var(--azul)">−39% a −60%</div>
+        <div class="bofa-sig-desc">Oversold moderado — acumulación selectiva, tamaño reducido</div>
+      </div>
+      <div class="bofa-sig-row">
+        <div class="bofa-sig-dot" style="background:var(--txt2)"></div>
+        <div class="bofa-sig-val" style="color:var(--txt2)">−20% a +40%</div>
+        <div class="bofa-sig-desc">Zona neutral — sin señal clara, seguir otros indicadores</div>
+      </div>
+      <div class="bofa-sig-row">
+        <div class="bofa-sig-dot" style="background:var(--ambar)"></div>
+        <div class="bofa-sig-val" style="color:var(--ambar)">+60% a +80%</div>
+        <div class="bofa-sig-desc">Overbought — reducir nuevas posiciones, vigilar stops</div>
+      </div>
+      <div class="bofa-sig-row">
+        <div class="bofa-sig-dot" style="background:var(--rojo)"></div>
+        <div class="bofa-sig-val" style="color:var(--rojo)">≥ +89%</div>
+        <div class="bofa-sig-desc">SELL signal histórico — euforia extrema, máxima precaución</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COL 2: Override manual + proxy auto -->
+  <div>
+    <!-- Override manual BofA -->
+    <div class="bofa-override" style="margin-bottom:10px;">
+      <span class="bofa-override-title">⬡ DATO REAL BofA (override manual)</span>
+      <div class="bofa-input-row">
+        <input id="bofa-manual-input" type="number" min="-100" max="100" step="1"
+          class="bofa-input" placeholder="—"
+          title="Introduce el dato net% de BofA cuando lo veas en Bloomberg/Twitter"/>
+        <span class="bofa-input-unit">net %</span>
+        <button class="bofa-save-btn" onclick="saveBofaManual()">✓ APLICAR</button>
+      </div>
+      <div class="bofa-source-row">
+        <button class="bofa-src-btn" id="bofa-src-auto" onclick="setBofaSource('auto')">AUTO (proxy)</button>
+        <button class="bofa-src-btn active" id="bofa-src-manual" onclick="setBofaSource('manual')">MANUAL (BofA real)</button>
+      </div>
+      <div class="bofa-last-manual" id="bofa-last-manual-txt">
+        Último dato BofA: <strong id="bofa-last-val">—</strong> · <span id="bofa-last-date">—</span><br>
+        <span style="color:var(--txt3)">Ref. imagen: Mar 23 = −39% (oversold) · Ene 28 = +89% (overbought)</span>
+      </div>
+    </div>
+
+    <!-- Proxy automático -->
+    <div class="bofa-proxy-col">
+      <div class="bofa-proxy-title">◎ PROXY USA calculado automáticamente</div>
+      <div class="pm"><span class="ml" style="font-size:9px;">% ETFs bajo MM50 Y MM200</span><div class="mr"><span class="mv" id="bofa-proxy-val">—</span><span class="tag" id="bofa-proxy-tag">—</span></div></div>
+      <div class="pm"><span class="ml" style="font-size:9px;">Nº ETFs analizados</span><div class="mr"><span class="mv" id="bofa-proxy-n">—</span></div></div>
+      <div class="pm"><span class="ml" style="font-size:9px;">SPY bajo MM50+MM200</span><div class="mr"><span class="tag" id="bofa-spy-tag">—</span></div></div>
+      <div class="pm"><span class="ml" style="font-size:9px;">QQQ bajo MM50+MM200</span><div class="mr"><span class="tag" id="bofa-qqq-tag">—</span></div></div>
+      <div class="pm"><span class="ml" style="font-size:9px;">Sectores bajo ambas MMs</span><div class="mr"><span class="mv" id="bofa-sects-below">—</span><span class="ml" style="font-size:9px;">/11</span></div></div>
+      <div class="pm"><span class="ml" style="font-size:9px;">Net proxy (normalizado)</span><div class="mr"><span class="mv" id="bofa-net-proxy">—</span><span class="tag" id="bofa-net-proxy-tag">—</span></div></div>
+      <div style="font-size:9px;color:var(--txt3);margin-top:8px;line-height:1.65;padding:7px;background:var(--bg3);border-radius:3px;border-left:2px solid var(--borde2);">
+        <strong style="color:var(--txt2)">Limitación:</strong> el proxy USA cubre SPY+QQQ+11 ETFs sectoriales. 
+        El BofA real usa todos los índices MSCI ACWI globales. 
+        Introduce el dato real cuando lo tengas para máxima precisión.
+      </div>
+    </div>
+  </div>
+
+  <!-- COL 3: Historia + contexto -->
+  <div class="bofa-history-col">
+    <div class="bofa-hist-title">◈ historial de lecturas manuales</div>
+    <canvas id="bofa-hist-canvas" style="width:100%;height:120px;display:block;"></canvas>
+    <div style="display:flex;justify-content:space-between;font-size:8px;color:var(--txt3);margin-top:3px;">
+      <span>más antiguo</span><span>hoy</span>
+    </div>
+
+    <div style="margin-top:10px;">
+      <div class="bofa-proxy-title" style="margin-bottom:6px;">◈ lecturas recientes</div>
+      <div id="bofa-readings-list" style="font-size:9px;color:var(--txt2);line-height:2;">
+        <div style="color:var(--txt3)">Sin lecturas guardadas aún.<br>Introduce el dato de BofA cuando lo veas.</div>
+      </div>
+    </div>
+
+    <div style="margin-top:10px;padding:8px;background:var(--bg3);border-radius:3px;border-left:2px solid var(--lima);">
+      <div style="font-size:8px;letter-spacing:1.5px;color:var(--lima);font-weight:700;margin-bottom:5px;">◈ LÓGICA DE SEÑAL</div>
+      <div style="font-size:9px;color:var(--txt2);line-height:1.7;">
+        La señal <strong style="color:var(--verde)">BUY</strong> se activa únicamente en lecturas ≤ −88% 
+        (histórico BofA: señal de compra agresiva). Lecturas entre −39% y −60% 
+        se consideran <strong style="color:var(--azul)">oversold moderado</strong> — acumulación selectiva.<br><br>
+        <strong>Importante:</strong> este indicador no penaliza el F&amp;G 2.0 ni el Market Quality Score. 
+        Es un filtro independiente de largo plazo — como el MM10 mensual.
+      </div>
+    </div>
+  </div>
+
+  <!-- COL 4: Señal actual + contexto de referencia -->
+  <div>
+    <div class="bofa-proxy-title" style="margin-bottom:8px;">◈ SEÑAL ACTIVA</div>
+
+    <div style="background:var(--bg3);border:1px solid var(--borde);border-radius:3px;padding:12px;margin-bottom:10px;text-align:center;">
+      <div style="font-size:9px;color:var(--txt3);letter-spacing:1.5px;margin-bottom:6px;">ACCIÓN SUGERIDA</div>
+      <div style="font-size:20px;font-weight:700;letter-spacing:2px;" id="bofa-action-label">—</div>
+      <div style="font-size:9px;color:var(--txt2);margin-top:5px;line-height:1.6;" id="bofa-action-desc">Introduce el dato de BofA o espera a que el proxy calcule.</div>
+    </div>
+
+    <div class="pm"><span class="ml" style="font-size:9px;">Fuente activa</span><div class="mr"><span class="tag" id="bofa-active-source">—</span></div></div>
+    <div class="pm"><span class="ml" style="font-size:9px;">Valor activo</span><div class="mr"><span class="mv" id="bofa-active-val">—</span></div></div>
+    <div class="pm"><span class="ml" style="font-size:9px;">Zona</span><div class="mr"><span class="tag" id="bofa-zone-tag">—</span></div></div>
+    <div class="pm"><span class="ml" style="font-size:9px;">Dist. a BUY signal</span><div class="mr"><span class="mv" id="bofa-dist-buy">—</span></div></div>
+    <div class="pm"><span class="ml" style="font-size:9px;">Dist. a SELL signal</span><div class="mr"><span class="mv" id="bofa-dist-sell">—</span></div></div>
+
+    <div style="margin-top:10px;font-size:9px;color:var(--txt3);line-height:1.7;">
+      Referencias BofA (imagen adjunta):<br>
+      <span style="color:var(--verde)">Mar 23 = −39%</span> oversold reciente<br>
+      <span style="color:var(--ambar)">Ene 28 = +89%</span> overbought reciente<br>
+      <span style="color:var(--azul)">Actual = −16%</span> net (per BofA report)
+    </div>
+
+    <div style="margin-top:8px;font-size:9px;color:var(--txt3);">
+      <a href="https://research.bofasecurities.com/" target="_blank" style="color:var(--azul);text-decoration:none;">BofA Global Research ↗</a>
+      <span style="margin:0 6px;">·</span>
+      <a href="https://www.msci.com/acwi" target="_blank" style="color:var(--azul);text-decoration:none;">MSCI ACWI ↗</a>
+    </div>
+  </div>
+
+</div><!-- /bofa-panel -->
+</div><!-- /bofa-section -->
+
 <div style="text-align:center;padding:10px 20px 18px;font-size:9px;color:var(--txt3)">
   ToreandoTrades — Fear &amp; Greed 2.0 + Market Timing Dashboard · Solo informativo, no es asesoramiento financiero · Datos vía Finnhub (ETFs proxy)
 </div>
@@ -818,7 +1145,32 @@ html.light .qlink { border-bottom-color:rgba(168,188,200,.5); }
     <button class="hclose" onclick="toggleHelp()">✕ CERRAR</button>
   </div>
 
-  <div class="hmod-sec" id="h-exec" style="display:none">
+  <div class="hmod-sec" id="h-bofa">
+    <h3>BofA Global Breadth Rule</h3>
+    <div class="hitem">
+      <div class="hitem-name">¿Qué es el BofA Global Breadth Rule?</div>
+      <div class="hitem-desc">Indicador propietario de Bank of America que mide el porcentaje neto de índices de renta variable global (MSCI ACWI) que cotizan por debajo de sus medias móviles de 50 y 200 días simultáneamente. Rango: −100% (todos debajo = oversold extremo) a +100% (todos por encima = overbought extremo).</div>
+    </div>
+    <div class="hitem">
+      <div class="hitem-name">Señales históricas clave</div>
+      <div class="hitem-desc">
+        ≤ −88%: señal BUY histórica — compra agresiva contrarian (máximo pesimismo institucional).<br>
+        −39% (Mar 23 2025): lectura oversold reciente — zona de acumulación selectiva.<br>
+        +89% (Ene 28 2025): lectura overbought reciente — señal SELL, euforia extrema.<br>
+        Actual −16%: territorio neutral-bajo según el último reporte BofA.
+      </div>
+    </div>
+    <div class="hitem">
+      <div class="hitem-name">Cómo usarlo en el dashboard</div>
+      <div class="hitem-desc">El panel calcula un proxy automático usando SPY, QQQ y los 11 ETFs sectoriales disponibles. Cuando tengas el dato real de BofA (en Twitter/Bloomberg/Research), introdúcelo manualmente — ese valor tiene prioridad sobre el proxy. El indicador es independiente y NO afecta al F&G 2.0 ni al Market Quality Score — es un filtro de largo plazo similar al MM10 mensual.</div>
+    </div>
+    <div class="hitem">
+      <div class="hitem-name">¿Por qué no penaliza el reloj?</div>
+      <div class="hitem-desc">Como señaló el usuario: la señal más relevante es el oversold extremo como oportunidad de compra contrarian. Penalizar el F&G 2.0 cuando estamos en zona oversold sería contraproducente — precisamente cuando más bajo está el indicador es cuando más deberías estar atento a comprar, no a salir. El panel se muestra de forma independiente para que lo interpretes en contexto.</div>
+    </div>
+  </div>
+
+
     <h3>Ventana de Ejecución</h3>
     <div class="hitem"><div class="hitem-name">Ventana de Ejecución (0–100)</div><div class="hitem-desc">Puntuación independiente que evalúa si los setups están funcionando en este momento: ¿se mantienen las rupturas sobre pivotes? ¿se compran los retrocesos rápido? ¿hay seguimiento multi-día? Un mercado puede tener buena calidad estructural pero mala ventana de ejecución (choppy), o viceversa.</div></div>
   </div>
@@ -1037,6 +1389,7 @@ async function cargarDatos(){
 
   procesarFG(D);
   procesarMQ(D);
+  computeAndRenderBofaProxy(D);
   renderTicker(D);
   setPG(88);
   await generarIA(D);
@@ -1375,7 +1728,303 @@ Modo: ${modo}. ¿Operar hoy? Tamaño completo/reducido/liquidez. Español, termi
   }
 }
 
+// ══════════════════════════════════════════════
+// BofA GLOBAL BREADTH RULE — ENGINE
+// ══════════════════════════════════════════════
+
+// State: manual override history + source preference
+let _bofaSource = 'manual';   // 'auto' | 'manual'
+let _bofaManualVal = null;    // latest manual value
+let _bofaHistory = [];        // [{val, date, source}] — last 30 entries
+let _bofaProxyVal = null;     // computed from ETFs
+
+// Thresholds
+const BOFA_BUY_SIGNAL  = -88;
+const BOFA_SELL_SIGNAL = +89;
+const BOFA_OVERSOLD_MOD = -39;
+const BOFA_OVERBOUGHT_MOD = +60;
+
+function setBofaSource(src) {
+  _bofaSource = src;
+  $('bofa-src-auto').classList.toggle('active', src==='auto');
+  $('bofa-src-manual').classList.toggle('active', src==='manual');
+  renderBofaPanel();
+}
+
+function saveBofaManual() {
+  const inp = $('bofa-manual-input');
+  const v = parseFloat(inp.value);
+  if (isNaN(v) || v < -100 || v > 100) {
+    inp.style.borderColor = 'var(--rojo)';
+    setTimeout(() => inp.style.borderColor = '', 1500);
+    return;
+  }
+  inp.style.borderColor = 'var(--lima)';
+  setTimeout(() => inp.style.borderColor = '', 1000);
+
+  _bofaManualVal = v;
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('es-ES', {day:'2-digit', month:'short', year:'numeric'});
+  _bofaHistory.unshift({ val: v, date: dateStr, source: 'BofA manual' });
+  if (_bofaHistory.length > 30) _bofaHistory = _bofaHistory.slice(0, 30);
+
+  $('bofa-src-manual').classList.add('active');
+  $('bofa-src-auto').classList.remove('active');
+  _bofaSource = 'manual';
+
+  renderBofaPanel();
+}
+
+// Compute proxy from available ETF data
+function computeBofaProxy(D) {
+  const proxySym = ['SPY','QQQ',...SECTORES.map(s=>s.sym)];
+  let below = 0, total = 0;
+  const details = {};
+
+  for (const sym of proxySym) {
+    const q = D[sym];
+    if (!q || !q.closes || q.closes.length < 50) continue;
+    const m50  = sma(q.closes, 50);
+    const m200 = sma(q.closes, 200);
+    const isBelowBoth = m50 && m200 && q.cur < m50 && q.cur < m200;
+    details[sym] = { belowBoth: isBelowBoth, cur: q.cur, m50, m200 };
+    if (isBelowBoth) below++;
+    total++;
+  }
+
+  if (total === 0) return null;
+
+  // net % = (above - below) / total * 100
+  const above = total - below;
+  const netPct = Math.round(((above - below) / total) * 100);
+
+  // Sector count
+  const sectsBelow = SECTORES.filter(s => details[s.sym]?.belowBoth).length;
+
+  return {
+    netPct,
+    total,
+    below,
+    sectsBelow,
+    spyBelowBoth: details['SPY']?.belowBoth || false,
+    qqqBelowBoth: details['QQQ']?.belowBoth || false,
+  };
+}
+
+function bofaSignalFromValue(v) {
+  if (v === null || v === undefined) return { word:'—', col:'var(--txt3)', action:'—', desc:'Sin datos', zone:'—', zoneCls:'tgr' };
+  if (v <= BOFA_BUY_SIGNAL)     return { word:'BUY SIGNAL', col:'var(--verde)', action:'COMPRA AGRESIVA', desc:'Oversold extremo histórico — señal contrarian de máxima confianza. Aumentar tamaño.', zone:'OVERSOLD EXTREMO', zoneCls:'tg' };
+  if (v <= -60)                  return { word:'OVERSOLD', col:'var(--verde)', action:'ACUMULAR', desc:'Zona de oversold significativo. Acumulación en retrocesos, tamaño controlado.', zone:'OVERSOLD', zoneCls:'tg' };
+  if (v <= BOFA_OVERSOLD_MOD)    return { word:'OVERSOLD MOD.', col:'var(--azul)', action:'SELECTIVO', desc:'Oversold moderado (como Mar 23). Setups A+ con tamaño reducido.', zone:'OVERSOLD MOD', zoneCls:'tb' };
+  if (v < -20)                   return { word:'NEUTRAL BAJO', col:'var(--txt2)', action:'ESPERAR', desc:'Zona neutral con sesgo bajista leve. Sin señal clara, seguir otros filtros.', zone:'NEUTRAL BAJO', zoneCls:'tgr' };
+  if (v <= +40)                  return { word:'NEUTRAL', col:'var(--txt2)', action:'NEUTRAL', desc:'Sin señal de breadth. Operar según F&G 2.0 y Market Quality Score.', zone:'NEUTRAL', zoneCls:'tgr' };
+  if (v <= BOFA_OVERBOUGHT_MOD)  return { word:'OVERBOUGHT MOD.', col:'var(--ambar)', action:'REDUCIR NUEVAS', desc:'Acercándose a zona overbought. No abrir nuevas posiciones grandes. Ajustar stops.', zone:'OVERBOUGHT MOD', zoneCls:'ta' };
+  if (v < BOFA_SELL_SIGNAL)      return { word:'OVERBOUGHT', col:'var(--ambar)', action:'VIGILAR STOPS', desc:'Overbought significativo. Reducir exposición, stops ajustados en posiciones abiertas.', zone:'OVERBOUGHT', zoneCls:'ta' };
+  return                                { word:'SELL SIGNAL', col:'var(--rojo)', action:'MÁXIMA CAUTELA', desc:`Overbought extremo (como Ene 28 = +89%). Euforia máxima — precaución total, no comprar.`, zone:'OVERBOUGHT EXTREMO', zoneCls:'tr' };
+}
+
+function renderBofaPanel() {
+  // Determine active value
+  let activeVal = null;
+  let activeSource = '—';
+
+  if (_bofaSource === 'manual' && _bofaManualVal !== null) {
+    activeVal   = _bofaManualVal;
+    activeSource = 'BofA real';
+  } else if (_bofaProxyVal !== null) {
+    activeVal   = _bofaProxyVal.netPct;
+    activeSource = 'Proxy USA';
+  } else if (_bofaManualVal !== null) {
+    activeVal   = _bofaManualVal;
+    activeSource = 'BofA real';
+  }
+
+  const sig = bofaSignalFromValue(activeVal);
+
+  // Gauge needle: map -100..+100 → -90deg..+90deg
+  const angle = activeVal !== null ? activeVal * 0.9 : 0;
+  const needle = $('bofa-needle');
+  if (needle) { needle.style.transform = `rotate(${angle}deg)`; needle.style.stroke = sig.col; }
+
+  // Gauge arc: left = -100, center = 0, right = +100
+  // Map to 0..100 percentage for arc drawing
+  const pct = activeVal !== null ? (activeVal + 100) / 200 : 0.5;
+  const arcEl = $('bofa-arc');
+  if (arcEl) {
+    const cx=90,cy=95,r=80;
+    const toRad = a => a*Math.PI/180;
+    const startAngle = -180;
+    const endAngle   = -180 + pct*180;
+    const x1=cx+r*Math.cos(toRad(startAngle)), y1=cy+r*Math.sin(toRad(startAngle));
+    const x2=cx+r*Math.cos(toRad(endAngle)),   y2=cy+r*Math.sin(toRad(endAngle));
+    const largeArc = pct > 0.5 ? 1 : 0;
+    arcEl.setAttribute('d', `M${x1.toFixed(1)},${y1.toFixed(1)} A${r},${r} 0 ${largeArc},1 ${x2.toFixed(1)},${y2.toFixed(1)}`);
+    arcEl.style.stroke = sig.col;
+  }
+
+  // Thermometer bar needle: 0% = -100, 100% = +100
+  const barPct = activeVal !== null ? ((activeVal + 100) / 200 * 100).toFixed(1)+'%' : '50%';
+  const bneedle = $('bofa-needle-bar');
+  if (bneedle) bneedle.style.left = barPct;
+
+  // Text elements
+  el('bofa-num', activeVal !== null ? (activeVal >= 0 ? '+'+activeVal : activeVal) : '—');
+  const gnEl = $('bofa-num'); if (gnEl) gnEl.style.color = sig.col;
+  const swEl = $('bofa-signal-word'); if (swEl) { swEl.textContent = sig.word; swEl.style.color = sig.col; swEl.style.textShadow = `0 0 14px ${sig.col}`; }
+
+  // Source indicator
+  const sdot = $('bofa-src-dot'); const slbl = $('bofa-src-label');
+  if (sdot && slbl) {
+    sdot.style.background = _bofaSource==='manual' && _bofaManualVal!==null ? 'var(--verde)' : activeVal!==null ? 'var(--ambar)' : 'var(--txt3)';
+    slbl.textContent = activeVal !== null ? activeSource : 'sin datos';
+    slbl.style.color = activeVal !== null ? 'var(--txt2)' : 'var(--txt3)';
+  }
+
+  // Action box
+  const al = $('bofa-action-label'); const ad = $('bofa-action-desc');
+  if (al) { al.textContent = sig.action; al.style.color = sig.col; }
+  if (ad) ad.textContent = sig.desc;
+
+  // Stats
+  tag('bofa-active-source', activeSource, activeSource==='BofA real'?'tg':'ta');
+  el('bofa-active-val', activeVal !== null ? (activeVal >= 0 ? '+'+activeVal+'%' : activeVal+'%') : '—');
+  tag('bofa-zone-tag', sig.zone, sig.zoneCls);
+  el('bofa-dist-buy',  activeVal !== null ? (activeVal - BOFA_BUY_SIGNAL).toFixed(0)+' pts' : '—');
+  el('bofa-dist-sell', activeVal !== null ? (BOFA_SELL_SIGNAL - activeVal).toFixed(0)+' pts' : '—');
+
+  // Manual last value
+  if (_bofaManualVal !== null && _bofaHistory.length > 0) {
+    el('bofa-last-val',  (_bofaManualVal>=0?'+':'')+_bofaManualVal+'%');
+    el('bofa-last-date', _bofaHistory[0].date);
+  }
+
+  // Proxy panel
+  if (_bofaProxyVal) {
+    const p = _bofaProxyVal;
+    el('bofa-proxy-val', (p.netPct>=0?'+':'')+p.netPct+'%');
+    tag('bofa-proxy-tag', p.netPct<=-60?'OVERSOLD':p.netPct<=-20?'OVERSOLD MOD':p.netPct<=40?'NEUTRAL':p.netPct<=60?'OVERBOUGHT MOD':'OVERBOUGHT',
+        p.netPct<=-60?'tg':p.netPct<=-20?'tb':p.netPct<=40?'tgr':p.netPct<=60?'ta':'tr');
+    el('bofa-proxy-n', p.total);
+    tag('bofa-spy-tag', p.spyBelowBoth?'DEBAJO':'ENCIMA', p.spyBelowBoth?'tr':'tg');
+    tag('bofa-qqq-tag', p.qqqBelowBoth?'DEBAJO':'ENCIMA', p.qqqBelowBoth?'tr':'tg');
+    el('bofa-sects-below', p.sectsBelow);
+    el('bofa-net-proxy', (p.netPct>=0?'+':'')+p.netPct+'%');
+    tag('bofa-net-proxy-tag', p.netPct<=-39?'OVERSOLD':p.netPct>60?'OVERBOUGHT':'NEUTRAL',
+        p.netPct<=-39?'tg':p.netPct>60?'ta':'tgr');
+  }
+
+  renderBofaHistory();
+  renderBofaReadingsList();
+}
+
+function renderBofaHistory() {
+  const canvas = $('bofa-hist-canvas'); if (!canvas) return;
+  const dpr = window.devicePixelRatio||1;
+  canvas.width = canvas.offsetWidth * dpr || 400;
+  canvas.height = 120 * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  const w = canvas.width/dpr, h = canvas.height/dpr;
+  ctx.clearRect(0,0,w,h);
+
+  // Build data series: combine manual history + auto proxy
+  let data = [];
+  if (_bofaHistory.length > 0) {
+    data = [..._bofaHistory].reverse().map(r => r.val);
+  } else if (_bofaProxyVal) {
+    // Show single point
+    data = [_bofaProxyVal.netPct];
+  }
+
+  // Draw zone bands
+  const zones = [
+    { min:-100, max:-88, col:'rgba(34,211,160,.12)' },
+    { min:-88,  max:-20, col:'rgba(56,182,255,.07)' },
+    { min:-20,  max:+60, col:'rgba(122,155,184,.05)' },
+    { min:+60,  max:+89, col:'rgba(255,179,32,.07)' },
+    { min:+89,  max:+100,col:'rgba(255,61,90,.12)' },
+  ];
+  const toY = v => h - ((v+100)/200)*h;
+  zones.forEach(z => {
+    const y1=toY(z.max), y2=toY(z.min);
+    ctx.fillStyle=z.col; ctx.fillRect(0,y1,w,y2-y1);
+  });
+
+  // Reference lines
+  [BOFA_BUY_SIGNAL, BOFA_OVERSOLD_MOD, 0, BOFA_OVERBOUGHT_MOD, BOFA_SELL_SIGNAL].forEach(v => {
+    const y = toY(v);
+    const col = v<=0 ? 'rgba(34,211,160,.4)' : v===0 ? 'rgba(122,155,184,.4)' : 'rgba(255,61,90,.3)';
+    ctx.strokeStyle = col; ctx.lineWidth=0.8; ctx.setLineDash([3,5]);
+    ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle='rgba(58,85,112,.8)'; ctx.font='7px IBM Plex Mono';
+    ctx.fillText(v>=0?'+'+v:v, 3, y-2);
+  });
+
+  // Zero line
+  const zy = toY(0);
+  ctx.strokeStyle='rgba(122,155,184,.6)'; ctx.lineWidth=1; ctx.setLineDash([]);
+  ctx.beginPath(); ctx.moveTo(0,zy); ctx.lineTo(w,zy); ctx.stroke();
+
+  if (data.length === 0) {
+    ctx.fillStyle='var(--txt3)'; ctx.font='10px IBM Plex Mono'; ctx.textAlign='center';
+    ctx.fillText('Sin historial de lecturas', w/2, h/2); return;
+  }
+
+  if (data.length === 1) {
+    // Single point
+    const x=w/2, y=toY(data[0]);
+    ctx.beginPath(); ctx.arc(x,y,4,0,Math.PI*2);
+    ctx.fillStyle=data[0]<=-39?'#22d3a0':data[0]>=60?'#ff3d5a':'#7a9bb8'; ctx.fill(); return;
+  }
+
+  // Line chart
+  const xStep = w / (data.length-1);
+  const grad = ctx.createLinearGradient(0,0,0,h);
+  const lastV = data[data.length-1];
+  const col = lastV<=-39?'34,211,160':lastV>=60?'255,61,90':'122,155,184';
+  grad.addColorStop(0,`rgba(${col},.3)`); grad.addColorStop(1,`rgba(${col},.01)`);
+  ctx.beginPath();
+  data.forEach((v,i) => { const x=i*xStep, y=toY(v); i===0?ctx.moveTo(x,y):ctx.lineTo(x,y); });
+  ctx.lineTo(w,h); ctx.lineTo(0,h); ctx.closePath(); ctx.fillStyle=grad; ctx.fill();
+  ctx.beginPath(); ctx.strokeStyle=`rgba(${col},1)`; ctx.lineWidth=1.5;
+  data.forEach((v,i) => { const x=i*xStep, y=toY(v); i===0?ctx.moveTo(x,y):ctx.lineTo(x,y); });
+  ctx.stroke();
+  // Last dot
+  const lx=(data.length-1)*xStep, ly=toY(lastV);
+  ctx.beginPath(); ctx.arc(lx,ly,3.5,0,Math.PI*2);
+  ctx.fillStyle=`rgb(${col})`; ctx.shadowColor=`rgb(${col})`; ctx.shadowBlur=6; ctx.fill(); ctx.shadowBlur=0;
+}
+
+function renderBofaReadingsList() {
+  const container = $('bofa-readings-list'); if (!container) return;
+  if (_bofaHistory.length === 0) {
+    container.innerHTML = '<div style="color:var(--txt3)">Sin lecturas guardadas aún.<br>Introduce el dato de BofA cuando lo veas.</div>';
+    return;
+  }
+  container.innerHTML = _bofaHistory.slice(0,8).map(r => {
+    const sig = bofaSignalFromValue(r.val);
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:2px 0;border-bottom:1px solid rgba(17,30,48,.4);">
+      <span style="color:var(--txt3);font-size:9px;">${r.date}</span>
+      <span style="font-weight:700;color:${sig.col};font-size:10px;">${r.val>=0?'+':''}${r.val}%</span>
+      <span class="tag ${sig.zoneCls}" style="font-size:8px;">${sig.zone}</span>
+    </div>`;
+  }).join('');
+}
+
+// Hook into cargarDatos to compute proxy
+function computeAndRenderBofaProxy(D) {
+  _bofaProxyVal = computeBofaProxy(D);
+  // If no manual value yet, default to auto
+  if (_bofaManualVal === null) {
+    _bofaSource = 'auto';
+    $('bofa-src-auto').classList.add('active');
+    $('bofa-src-manual').classList.remove('active');
+  }
+  renderBofaPanel();
+}
+
 // ── UI ─────────────────────────────────────────────────────────────────────
+
 function setMode(m){
   modo=m; $('mb-swing').classList.toggle('on',m==='swing'); $('mb-day').classList.toggle('on',m==='day'); cargarDatos();
 }
