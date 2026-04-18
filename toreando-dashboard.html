@@ -3,6 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Blogger iframe protection: force min-width so panels don't collapse -->
+<style>
+  html, body {
+    min-width: 1280px !important;
+    overflow-x: auto !important;
+  }
+</style>
 <title>ToreandoTrades — Dashboard V4</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
@@ -75,7 +82,27 @@ html.light .scanline      { display:none; }
    BASE
 ══════════════════════════════════════════════ */
 *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
-body { background:var(--bg0); color:var(--txt1); font-family:var(--font); font-size:12px; overflow-x:hidden; }
+
+/* Explicit values (not just variables) so Blogger iframe can't override them */
+html {
+  background: #050810 !important;
+  color: #e0eaf5 !important;
+}
+html.light {
+  background: #eaecef !important;
+  color: #0d1b2a !important;
+}
+body {
+  background: var(--bg0) !important;
+  color: var(--txt1) !important;
+  font-family: var(--font);
+  font-size: 12px;
+  /* overflow-x handled by min-width rule above */
+}
+/* Neutralise Blogger's injected link/anchor reset */
+a { color: inherit; }
+/* Neutralise Blogger p/h margin injection */
+p, h1, h2, h3, h4, h5, h6 { margin: 0; padding: 0; }
 
 .scanline {
   position:fixed; inset:0; pointer-events:none; z-index:1000;
@@ -353,14 +380,19 @@ html.light .qlink { border-bottom-color:rgba(168,188,200,.5); }
    RESPONSIVE
 ══════════════════════════════════════════════ */
 @media(max-width:1200px){
+  /* With min-width:1280px on body this only fires on mobile/tablet viewports */
   #s1-wrap,#s2-wrap { grid-template-columns:1fr; }
   #gauge-hero { grid-row:auto; }
-  #fg-panels  { grid-template-columns:repeat(3,1fr); }
+  /* Keep 5-col panels — only collapse at smaller sizes */
   #fg-botrow  { grid-template-columns:1fr 1fr; }
-  #paneles    { grid-template-columns:repeat(3,1fr); }
   #botrow     { grid-template-columns:1fr; }
   #fila4      { grid-template-columns:repeat(2,1fr); }
   #botrow,#fila4 { grid-column:1; }
+}
+@media(max-width:900px){
+  /* Genuine narrow screen — collapse panels */
+  #fg-panels  { grid-template-columns:repeat(3,1fr); }
+  #paneles    { grid-template-columns:repeat(3,1fr); }
 }
 @media(max-width:700px){
   #fg-panels,#paneles { grid-template-columns:repeat(2,1fr); }
@@ -384,7 +416,7 @@ html.light .qlink { border-bottom-color:rgba(168,188,200,.5); }
   gap:16px;
   align-items:start;
 }
-@media(max-width:1200px){ #bofa-panel { grid-template-columns:1fr 1fr; } }
+@media(max-width:900px){ #bofa-panel { grid-template-columns:1fr 1fr; } }
 @media(max-width:700px)  { #bofa-panel { grid-template-columns:1fr; } }
 
 /* Gauge circular BofA */
@@ -517,7 +549,7 @@ html.light .bofa-signal-box { background:#f4f7fa; }
   gap: 16px;
   align-items: start;
 }
-@media(max-width:1200px){ #zbt-panel { grid-template-columns: 1fr 1fr; } }
+@media(max-width:900px){ #zbt-panel { grid-template-columns: 1fr 1fr; } }
 @media(max-width:700px)  { #zbt-panel { grid-template-columns: 1fr; } }
 
 /* EMA gauge — vertical bar thermometer */
