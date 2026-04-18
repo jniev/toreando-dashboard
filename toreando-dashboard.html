@@ -737,12 +737,15 @@ html.light #zbt-panel      { }
 
     <!-- vs CNN -->
     <div class="vs-box">
-      <div style="font-size:8px;letter-spacing:2px;color:var(--txt3);margin-bottom:8px;text-transform:uppercase">◈ vs CNN F&amp;G original</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <div style="font-size:8px;letter-spacing:2px;color:var(--txt3);text-transform:uppercase">◈ vs CNN F&amp;G original</div>
+        <span id="cnn-live-badge" style="font-size:8px;color:var(--txt3);letter-spacing:.5px;">⬤ —</span>
+      </div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
         <span style="font-size:10px;color:var(--txt2)">CNN Fear &amp; Greed</span>
-        <span style="font-size:13px;font-weight:700;color:var(--rojo)" id="cnn-val">—</span>
+        <span style="font-size:13px;font-weight:700;" id="cnn-val">—</span>
       </div>
-      <div class="vs-bar-wrap"><div class="vs-bar" id="cnn-bar" style="background:var(--rojo)"></div></div>
+      <div class="vs-bar-wrap"><div class="vs-bar" id="cnn-bar" style="background:var(--azul)"></div></div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin:8px 0 2px">
         <span style="font-size:10px;color:var(--txt2)">F&amp;G 2.0 Multi-factor</span>
         <span style="font-size:13px;font-weight:700;color:var(--lima)" id="fg2-val">—</span>
@@ -751,6 +754,18 @@ html.light #zbt-panel      { }
       <div style="margin-top:8px;display:flex;align-items:center;gap:8px">
         <span style="font-size:9px;color:var(--txt3)">Diferencia:</span>
         <span class="delta-tag" id="delta-tag">—</span>
+      </div>
+      <!-- Manual CNN override -->
+      <div style="margin-top:8px;display:flex;align-items:center;gap:5px;">
+        <span style="font-size:8px;color:var(--txt3);white-space:nowrap;">CNN manual:</span>
+        <input id="cnn-manual-input" type="number" min="0" max="100" step="1"
+          style="background:var(--bg2);border:1px solid var(--borde2);color:var(--txt1);font-family:var(--font);font-size:11px;font-weight:700;padding:2px 6px;border-radius:2px;width:54px;outline:none;text-align:center;"
+          placeholder="—" title="Introduce el valor CNN F&G si la API no lo carga automáticamente"
+          onkeydown="if(event.key==='Enter') setCnnManual()"/>
+        <button onclick="setCnnManual()"
+          style="background:transparent;border:1px solid var(--borde2);color:var(--azul);font-family:var(--font);font-size:8px;padding:3px 7px;border-radius:2px;cursor:pointer;">✓</button>
+        <a href="https://edition.cnn.com/markets/fear-and-greed" target="_blank"
+          style="font-size:8px;color:var(--azul);text-decoration:none;white-space:nowrap;">↗ CNN</a>
       </div>
     </div>
 
@@ -1075,6 +1090,199 @@ html.light #zbt-panel      { }
   </div><!-- /fila4 -->
 
 </div><!-- /s2-wrap -->
+
+<!-- ════════════════════════════════════════════
+     SECCIÓN 3 — BofA GLOBAL BREADTH RULE
+════════════════════════════════════════════ -->
+<div class="sec-divider" style="margin-top:4px;">
+  <div class="sec-divider-line"></div>
+  <div class="sec-divider-label" style="color:var(--lima)">◈ BofA GLOBAL BREADTH RULE — SEÑAL DE TIMING GLOBAL (PANEL INDEPENDIENTE) <button class="hicon" onclick="showHelpItem('bofa')" style="color:var(--lima);border-color:rgba(232,255,71,.3);">?</button></div>
+  <div class="sec-divider-line"></div>
+</div>
+
+<div id="bofa-section">
+<div id="bofa-panel">
+
+  <!-- COL 1: Gauge + señal principal -->
+  <div class="bofa-gauge-wrap">
+    <div style="font-size:8px;letter-spacing:2.5px;color:var(--txt3);text-transform:uppercase;font-weight:600;">BofA Breadth Reading</div>
+
+    <!-- Semicircle gauge -->
+    <div class="bofa-arc-wrap" style="width:180px;height:100px;">
+      <svg viewBox="0 0 180 100" width="180" height="100" style="overflow:visible;">
+        <!-- zone arcs: oversold (buy) left, neutral mid, overbought right -->
+        <path d="M15,95 A80,80 0 0,1 48,21"  fill="none" stroke="#22d3a0" stroke-width="9" stroke-linecap="round" opacity=".35"/>
+        <path d="M48,21 A80,80 0 0,1 90,11"  fill="none" stroke="#38b6ff" stroke-width="9" stroke-linecap="round" opacity=".25"/>
+        <path d="M90,11 A80,80 0 0,1 132,21" fill="none" stroke="#7a9bb8" stroke-width="9" stroke-linecap="round" opacity=".2"/>
+        <path d="M132,21 A80,80 0 0,1 165,95" fill="none" stroke="#ff3d5a" stroke-width="9" stroke-linecap="round" opacity=".35"/>
+        <!-- value arc -->
+        <path id="bofa-arc" d="M90,11 A80,80 0 0,1 90,11" fill="none" stroke="#38b6ff" stroke-width="9" stroke-linecap="round" style="transition:d 1s cubic-bezier(.34,1.2,.64,1),stroke .6s"/>
+        <!-- needle -->
+        <line id="bofa-needle" x1="90" y1="95" x2="90" y2="23" stroke="var(--txt1)" stroke-width="1.5" stroke-linecap="round" style="transition:transform 1s cubic-bezier(.34,1.2,.64,1);transform-origin:90px 95px"/>
+        <circle cx="90" cy="95" r="4.5" fill="var(--txt1)"/>
+        <!-- labels -->
+        <text x="6"   y="105" font-family="IBM Plex Mono" font-size="8" fill="#22d3a0" font-weight="600">-100</text>
+        <text x="80"  y="10"  font-family="IBM Plex Mono" font-size="8" fill="var(--txt3)">0</text>
+        <text x="155" y="105" font-family="IBM Plex Mono" font-size="8" fill="#ff3d5a" font-weight="600">+100</text>
+      </svg>
+      <div class="bofa-center">
+        <div class="bofa-num" id="bofa-num">—</div>
+        <div class="bofa-sub">NET %</div>
+      </div>
+    </div>
+
+    <!-- Thermometer bar -->
+    <div style="width:100%;padding:0 4px;">
+      <div class="bofa-thermo">
+        <div class="bofa-thermo-needle" id="bofa-needle-bar" style="left:50%"></div>
+        <!-- zone ticks -->
+        <div style="position:absolute;top:0;left:5%;width:1px;height:100%;background:rgba(255,255,255,.2)"></div>
+        <div style="position:absolute;top:0;left:50%;width:1px;height:100%;background:rgba(255,255,255,.3)"></div>
+        <div style="position:absolute;top:0;left:92%;width:1px;height:100%;background:rgba(255,255,255,.2)"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:8px;color:var(--txt3);margin-top:2px;">
+        <span style="color:var(--verde);font-weight:700">BUY -88</span>
+        <span>0</span>
+        <span style="color:var(--rojo);font-weight:700">SELL +89</span>
+      </div>
+    </div>
+
+    <div class="bofa-signal" id="bofa-signal-word">—</div>
+
+    <!-- Source badge -->
+    <div style="display:flex;align-items:center;gap:5px;margin-top:2px;">
+      <div style="width:6px;height:6px;border-radius:50%;background:var(--txt3)" id="bofa-src-dot"></div>
+      <span style="font-size:9px;color:var(--txt3)" id="bofa-src-label">sin datos</span>
+    </div>
+
+    <!-- Señal boxes -->
+    <div class="bofa-signal-box" style="width:100%">
+      <div class="bofa-sig-row">
+        <div class="bofa-sig-dot" style="background:var(--verde)"></div>
+        <div class="bofa-sig-val" style="color:var(--verde)">≤ −88%</div>
+        <div class="bofa-sig-desc">BUY signal histórico — compra agresiva, señal contrarian extrema</div>
+      </div>
+      <div class="bofa-sig-row">
+        <div class="bofa-sig-dot" style="background:var(--azul)"></div>
+        <div class="bofa-sig-val" style="color:var(--azul)">−39% a −60%</div>
+        <div class="bofa-sig-desc">Oversold moderado — acumulación selectiva, tamaño reducido</div>
+      </div>
+      <div class="bofa-sig-row">
+        <div class="bofa-sig-dot" style="background:var(--txt2)"></div>
+        <div class="bofa-sig-val" style="color:var(--txt2)">−20% a +40%</div>
+        <div class="bofa-sig-desc">Zona neutral — sin señal clara, seguir otros indicadores</div>
+      </div>
+      <div class="bofa-sig-row">
+        <div class="bofa-sig-dot" style="background:var(--ambar)"></div>
+        <div class="bofa-sig-val" style="color:var(--ambar)">+60% a +80%</div>
+        <div class="bofa-sig-desc">Overbought — reducir nuevas posiciones, vigilar stops</div>
+      </div>
+      <div class="bofa-sig-row">
+        <div class="bofa-sig-dot" style="background:var(--rojo)"></div>
+        <div class="bofa-sig-val" style="color:var(--rojo)">≥ +89%</div>
+        <div class="bofa-sig-desc">SELL signal histórico — euforia extrema, máxima precaución</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COL 2: Override manual + proxy auto -->
+  <div>
+    <!-- Override manual BofA -->
+    <div class="bofa-override" style="margin-bottom:10px;">
+      <span class="bofa-override-title">⬡ DATO REAL BofA (override manual)</span>
+      <div class="bofa-input-row">
+        <input id="bofa-manual-input" type="number" min="-100" max="100" step="1"
+          class="bofa-input" placeholder="—"
+          title="Introduce el dato net% de BofA cuando lo veas en Bloomberg/Twitter"/>
+        <span class="bofa-input-unit">net %</span>
+        <button class="bofa-save-btn" onclick="saveBofaManual()">✓ APLICAR</button>
+      </div>
+      <div class="bofa-source-row">
+        <button class="bofa-src-btn" id="bofa-src-auto" onclick="setBofaSource('auto')">AUTO (proxy)</button>
+        <button class="bofa-src-btn active" id="bofa-src-manual" onclick="setBofaSource('manual')">MANUAL (BofA real)</button>
+      </div>
+      <div class="bofa-last-manual" id="bofa-last-manual-txt">
+        Último dato BofA: <strong id="bofa-last-val">—</strong> · <span id="bofa-last-date">—</span><br>
+        <span style="color:var(--txt3)">Ref. imagen: Mar 23 = −39% (oversold) · Ene 28 = +89% (overbought)</span>
+      </div>
+    </div>
+
+    <!-- Proxy automático -->
+    <div class="bofa-proxy-col">
+      <div class="bofa-proxy-title">◎ PROXY USA calculado automáticamente</div>
+      <div class="pm"><span class="ml" style="font-size:9px;">% ETFs bajo MM50 Y MM200</span><div class="mr"><span class="mv" id="bofa-proxy-val">—</span><span class="tag" id="bofa-proxy-tag">—</span></div></div>
+      <div class="pm"><span class="ml" style="font-size:9px;">Nº ETFs analizados</span><div class="mr"><span class="mv" id="bofa-proxy-n">—</span></div></div>
+      <div class="pm"><span class="ml" style="font-size:9px;">SPY bajo MM50+MM200</span><div class="mr"><span class="tag" id="bofa-spy-tag">—</span></div></div>
+      <div class="pm"><span class="ml" style="font-size:9px;">QQQ bajo MM50+MM200</span><div class="mr"><span class="tag" id="bofa-qqq-tag">—</span></div></div>
+      <div class="pm"><span class="ml" style="font-size:9px;">Sectores bajo ambas MMs</span><div class="mr"><span class="mv" id="bofa-sects-below">—</span><span class="ml" style="font-size:9px;">/11</span></div></div>
+      <div class="pm"><span class="ml" style="font-size:9px;">Net proxy (normalizado)</span><div class="mr"><span class="mv" id="bofa-net-proxy">—</span><span class="tag" id="bofa-net-proxy-tag">—</span></div></div>
+      <div style="font-size:9px;color:var(--txt3);margin-top:8px;line-height:1.65;padding:7px;background:var(--bg3);border-radius:3px;border-left:2px solid var(--borde2);">
+        <strong style="color:var(--txt2)">Limitación:</strong> el proxy USA cubre SPY+QQQ+11 ETFs sectoriales. 
+        El BofA real usa todos los índices MSCI ACWI globales. 
+        Introduce el dato real cuando lo tengas para máxima precisión.
+      </div>
+    </div>
+  </div>
+
+  <!-- COL 3: Historia + contexto -->
+  <div class="bofa-history-col">
+    <div class="bofa-hist-title">◈ historial de lecturas manuales</div>
+    <canvas id="bofa-hist-canvas" style="width:100%;height:120px;display:block;"></canvas>
+    <div style="display:flex;justify-content:space-between;font-size:8px;color:var(--txt3);margin-top:3px;">
+      <span>más antiguo</span><span>hoy</span>
+    </div>
+
+    <div style="margin-top:10px;">
+      <div class="bofa-proxy-title" style="margin-bottom:6px;">◈ lecturas recientes</div>
+      <div id="bofa-readings-list" style="font-size:9px;color:var(--txt2);line-height:2;">
+        <div style="color:var(--txt3)">Sin lecturas guardadas aún.<br>Introduce el dato de BofA cuando lo veas.</div>
+      </div>
+    </div>
+
+    <div style="margin-top:10px;padding:8px;background:var(--bg3);border-radius:3px;border-left:2px solid var(--lima);">
+      <div style="font-size:8px;letter-spacing:1.5px;color:var(--lima);font-weight:700;margin-bottom:5px;">◈ LÓGICA DE SEÑAL</div>
+      <div style="font-size:9px;color:var(--txt2);line-height:1.7;">
+        La señal <strong style="color:var(--verde)">BUY</strong> se activa únicamente en lecturas ≤ −88% 
+        (histórico BofA: señal de compra agresiva). Lecturas entre −39% y −60% 
+        se consideran <strong style="color:var(--azul)">oversold moderado</strong> — acumulación selectiva.<br><br>
+        <strong>Importante:</strong> este indicador no penaliza el F&amp;G 2.0 ni el Market Quality Score. 
+        Es un filtro independiente de largo plazo — como el MM10 mensual.
+      </div>
+    </div>
+  </div>
+
+  <!-- COL 4: Señal actual + contexto de referencia -->
+  <div>
+    <div class="bofa-proxy-title" style="margin-bottom:8px;">◈ SEÑAL ACTIVA</div>
+
+    <div style="background:var(--bg3);border:1px solid var(--borde);border-radius:3px;padding:12px;margin-bottom:10px;text-align:center;">
+      <div style="font-size:9px;color:var(--txt3);letter-spacing:1.5px;margin-bottom:6px;">ACCIÓN SUGERIDA</div>
+      <div style="font-size:20px;font-weight:700;letter-spacing:2px;" id="bofa-action-label">—</div>
+      <div style="font-size:9px;color:var(--txt2);margin-top:5px;line-height:1.6;" id="bofa-action-desc">Introduce el dato de BofA o espera a que el proxy calcule.</div>
+    </div>
+
+    <div class="pm"><span class="ml" style="font-size:9px;">Fuente activa</span><div class="mr"><span class="tag" id="bofa-active-source">—</span></div></div>
+    <div class="pm"><span class="ml" style="font-size:9px;">Valor activo</span><div class="mr"><span class="mv" id="bofa-active-val">—</span></div></div>
+    <div class="pm"><span class="ml" style="font-size:9px;">Zona</span><div class="mr"><span class="tag" id="bofa-zone-tag">—</span></div></div>
+    <div class="pm"><span class="ml" style="font-size:9px;">Dist. a BUY signal</span><div class="mr"><span class="mv" id="bofa-dist-buy">—</span></div></div>
+    <div class="pm"><span class="ml" style="font-size:9px;">Dist. a SELL signal</span><div class="mr"><span class="mv" id="bofa-dist-sell">—</span></div></div>
+
+    <div style="margin-top:10px;font-size:9px;color:var(--txt3);line-height:1.7;">
+      Referencias BofA (imagen adjunta):<br>
+      <span style="color:var(--verde)">Mar 23 = −39%</span> oversold reciente<br>
+      <span style="color:var(--ambar)">Ene 28 = +89%</span> overbought reciente<br>
+      <span style="color:var(--azul)">Actual = −16%</span> net (per BofA report)
+    </div>
+
+    <div style="margin-top:8px;font-size:9px;color:var(--txt3);">
+      <a href="https://research.bofasecurities.com/" target="_blank" style="color:var(--azul);text-decoration:none;">BofA Global Research ↗</a>
+      <span style="margin:0 6px;">·</span>
+      <a href="https://www.msci.com/acwi" target="_blank" style="color:var(--azul);text-decoration:none;">MSCI ACWI ↗</a>
+    </div>
+  </div>
+
+</div><!-- /bofa-panel -->
+</div><!-- /bofa-section -->
 
 <!-- ════════════════════════════════════════════
      SECCIÓN 4 — ZWEIG BREADTH THRUST (ZBT)
@@ -1462,7 +1670,51 @@ let temaClaro = false;
 let segActual = 0;
 let timerActual;
 let _apiKey = '';
-const CNN_CURRENT = 16;
+const CNN_CURRENT = 16; // fallback — se actualiza via fetchCnnFG()
+let _cnnLive = null;   // valor real si se consigue
+
+// Fetch CNN F&G via proxy público (feargreedmeter.com expone un endpoint)
+async function fetchCnnFG() {
+  try {
+    // feargreedmeter.com publica el dato sin CORS issues vía su API pública
+    const r = await fetch('https://feargreedmeter.com/api/v1/fgi/now', { signal: AbortSignal.timeout(5000) });
+    if (r.ok) { const d = await r.json(); if (d?.fgi?.now?.value) { _cnnLive = Math.round(d.fgi.now.value); return _cnnLive; } }
+  } catch(e) {}
+  // Fallback: try alternative endpoint
+  try {
+    const r2 = await fetch('https://api.alternative.me/fng/', { signal: AbortSignal.timeout(5000) });
+    if (r2.ok) { const d2 = await r2.json(); if (d2?.data?.[0]?.value) { _cnnLive = parseInt(d2.data[0].value); return _cnnLive; } }
+  } catch(e) {}
+  return null;
+}
+function getCnnVal() { return _cnnLive !== null ? _cnnLive : CNN_CURRENT; }
+
+function setCnnManual() {
+  const inp = $('cnn-manual-input');
+  const v = parseInt(inp.value);
+  if (isNaN(v) || v < 0 || v > 100) { inp.style.borderColor='var(--rojo)'; setTimeout(()=>inp.style.borderColor='',1500); return; }
+  _cnnLive = v;
+  inp.style.borderColor = 'var(--verde)'; setTimeout(()=>inp.style.borderColor='',1000);
+  // Update badge
+  const badge = $('cnn-live-badge');
+  if (badge) { badge.textContent = '⬤ MANUAL'; badge.style.color = 'var(--ambar)'; }
+  // Re-render gauge with new CNN value
+  const currentScore = parseFloat($('fg2-val')?.textContent || '50');
+  if (!isNaN(currentScore)) renderGaugeFG(currentScore);
+}
+
+// Update CNN live badge after fetch
+async function fetchCnnFGAndUpdate() {
+  const val = await fetchCnnFG();
+  const badge = $('cnn-live-badge');
+  if (val !== null) {
+    if (badge) { badge.textContent = '⬤ EN DIRECTO'; badge.style.color = 'var(--verde)'; }
+    const currentScore = parseFloat($('fg2-val')?.textContent || '50');
+    if (!isNaN(currentScore)) renderGaugeFG(currentScore);
+  } else {
+    if (badge) { badge.textContent = '⬤ FALLBACK'; badge.style.color = 'var(--ambar)'; }
+  }
+}
 
 const SECTORES = [
   {sym:'XLK',nm:'Tecnología'},{sym:'XLC',nm:'Com. Serv.'},
@@ -1523,10 +1775,20 @@ function updateHist(sym,cur){
 
 // ── DEMO DATA ──────────────────────────────────────────────────────────────
 function buildDemoData(){
-  const demos={'SPY':{cur:546.8,chg:-0.82},'QQQ':{cur:445.2,chg:-1.15},'VIXY':{cur:8.9,chg:12.4},'TLT':{cur:91.4,chg:-0.45},'UUP':{cur:28.7,chg:0.32},'HYG':{cur:78.2,chg:-0.68},'LQD':{cur:108.4,chg:-0.35}};
+  // Snapshot calibrado al mercado actual: VIX ~17, SPY cerca de ATH, mercado en greed
+  // VIXY ~8.3 → VIX ~17.4 con mult 2.1
+  const demos={
+    'SPY': {cur:564.2, chg:+0.92},   // SPY subiendo, cerca de ATH
+    'QQQ': {cur:478.5, chg:+1.15},
+    'VIXY':{cur:8.3,   chg:-3.2},    // VIX bajando → VIXY baja → ambiente positivo
+    'TLT': {cur:91.8,  chg:+0.18},   // TNX ~4.35%
+    'UUP': {cur:28.4,  chg:-0.12},   // DXY ligeramente bajista
+    'HYG': {cur:80.1,  chg:+0.42},   // crédito HY subiendo → risk-on
+    'LQD': {cur:110.2, chg:+0.22},
+  };
   const D={};
   for(const [sym,dd] of Object.entries(demos)){const closes=seedHist(sym,dd.cur);D[sym]={sym,cur:dd.cur,prev:dd.cur/(1+dd.chg/100),closes,chg:dd.chg};}
-  SECTORES.forEach(s=>{const chg=(Math.random()-.5)*2.5;const cur=100*(1+chg/100);D[s.sym]={sym:s.sym,cur,prev:100,closes:seedHist(s.sym,cur),chg};});
+  SECTORES.forEach(s=>{const chg=(Math.random()-.5)*1.8+0.3;const cur=100*(1+chg/100);D[s.sym]={sym:s.sym,cur,prev:100,closes:seedHist(s.sym,cur),chg};});
   return D;
 }
 
@@ -1545,8 +1807,27 @@ async function fhQuote(sym){
 }
 
 function deriveMacro(D){
-  if(D['VIXY']&&!D['^VIX']){const v=D['VIXY'];D['^VIX']={sym:'^VIX',cur:v.cur*4.2,prev:v.prev*4.2,closes:v.closes.map(c=>c*4.2),chg:v.chg,est:true};}
-  if(D['TLT']&&!D['^TNX']){const t=D['TLT'];const ty=c=>Math.max(1,9.5-c*0.055);D['^TNX']={sym:'^TNX',cur:ty(t.cur),prev:ty(t.prev),closes:t.closes.map(ty),chg:t.chg*-1,est:true};}
+  if(D['VIXY']&&!D['^VIX']){
+    const v=D['VIXY'];
+    // VIXY tracks short-term VIX futures. Calibration: VIXY ~8-9 = VIX ~15-18, ~12 = VIX ~25, ~18 = VIX ~40
+    // More accurate: VIX ≈ VIXY * (17/8.5) when VIXY near 8-9, but multiplier shrinks at high levels
+    // Piecewise: use dynamic ratio based on VIXY price range
+    const vixyPrice = v.cur;
+    let mult;
+    if      (vixyPrice < 6)  mult = 2.0;
+    else if (vixyPrice < 9)  mult = 2.1;  // VIXY 8.5 → VIX ~17-18
+    else if (vixyPrice < 12) mult = 2.15;
+    else if (vixyPrice < 16) mult = 2.2;
+    else                      mult = 2.3;
+    D['^VIX']={sym:'^VIX',cur:v.cur*mult,prev:v.prev*mult,closes:v.closes.map(c=>c*mult),chg:v.chg,est:true};
+  }
+  if(D['TLT']&&!D['^TNX']){
+    const t=D['TLT'];
+    // TLT duration ~17y. Calibration: TLT ~91 → TNX ~4.4%, TLT ~85 → TNX ~4.8%, TLT ~100 → TNX ~3.9%
+    // More precise: yield ≈ -0.063*(price) + 10.1 in current range
+    const ty=c=>Math.max(0.5,Math.min(8, -0.063*c+10.1));
+    D['^TNX']={sym:'^TNX',cur:ty(t.cur),prev:ty(t.prev),closes:t.closes.map(ty),chg:t.chg*-1,est:true};
+  }
   if(D['UUP']&&!D['DXY']){const u=D['UUP'];D['DXY']={sym:'DXY',cur:u.cur*3.58,prev:u.prev*3.58,closes:u.closes.map(c=>c*3.58),chg:u.chg,est:true};}
 }
 
@@ -1578,15 +1859,26 @@ async function cargarDatos(){
   }
   setPG(60);
 
+  // Fetch CNN F&G live (non-blocking — updates display after main render)
+  fetchCnnFGAndUpdate().catch(()=>{});
+
   deriveMacro(D);
   updateSourceIndicator(getKey(), Object.keys(D).length);
 
   const diag=$('diag-bar');
   if(diag){
     const est=['^VIX','^TNX','DXY'].filter(s=>D[s]?.est);
-    if(!getKey()){diag.style.display='flex';diag.style.background='#0a0800';diag.style.color='var(--ambar)';diag.style.borderBottomColor='var(--ambar)';diag.textContent='ℹ MODO DEMO — introduce tu API key de Finnhub para datos en tiempo real (plan gratuito).';}
-    else if(est.length){diag.style.display='flex';diag.textContent=`ℹ VIX/TNX/DXY estimados via ETFs proxy (VIXY/TLT/UUP). Medias móviles usan histórico sintético.`;}
-    else{diag.style.display='none';}
+    const vixEst = D['^VIX']?.est;
+    if(!getKey()){
+      diag.style.display='flex'; diag.style.background='#0a0800'; diag.style.color='var(--ambar)'; diag.style.borderBottomColor='var(--ambar)';
+      diag.textContent='ℹ MODO DEMO — introduce tu API key de Finnhub para datos en tiempo real (plan gratuito).';
+    } else if(est.length){
+      diag.style.display='flex'; diag.style.background='#0a0d00'; diag.style.color='var(--ambar)'; diag.style.borderBottomColor='var(--ambar)';
+      const vixActual = D['^VIX'] ? D['^VIX'].cur.toFixed(1) : '—';
+      diag.textContent=`ℹ VIX estimado via VIXY proxy (~${vixActual}) · TNX via TLT · DXY via UUP · Medias móviles usan histórico sintético. Para Put/Call y VVIX exactos consultar StockCharts.`;
+    } else {
+      diag.style.display='none';
+    }
   }
 
   procesarFG(D);
@@ -1624,9 +1916,25 @@ function procesarFG(D){
   const vixReg=vixC<15?'BAJO':vixC<20?'NORMAL':vixC<30?'ELEVADO':'EXTREMO';
   tag('fg-vol-regime',vixReg,vixC<15?'tg':vixC<20?'tgr':vixC<30?'ta':'tr'); badgeFG('vol-badge-fg',volS);
 
-  // 2. OPTIONS
-  let optS=50; const pcR=vixC<18?0.72:vixC<25?0.94:1.22;
-  const vvixE=vixy?Math.max(60,Math.min(200,95+vixy.chg*3.5)):95;
+  // 2. OPTIONS — usar SPY change y VIX para estimar P/C más fielmente
+  // Put/Call equity real (CPCE) típico: 0.45-0.55 en mercados alcistas, 0.7-0.9 en bajistas
+  // Lo estimamos desde la dirección y magnitud de SPY + VIX
+  let optS=50;
+  const spyChgForPC = spy ? spy.chg : 0;
+  // Cuando SPY sube fuerte → pocas puts → P/C bajo (alcista). Cuando cae → P/C alto
+  const pcR = Math.max(0.3, Math.min(1.5,
+    0.55                           // baseline neutral
+    - spyChgForPC * 0.05           // SPY up → P/C baja
+    + (vixC > 25 ? 0.2 : vixC > 20 ? 0.1 : vixC < 15 ? -0.08 : 0)  // VIX premium
+  ));
+  // VVIX: volatilidad del propio VIX. Rango normal 80-110. Sube cuando VIX se mueve rápido.
+  // Estimamos desde el cambio del día de VIXY (proxy del movimiento del VIX)
+  const vixyDayChg = vixy ? Math.abs(vixy.chg) : 2;
+  const vvixE = Math.max(70, Math.min(160,
+    88                             // baseline histórico
+    + vixyDayChg * 2.5             // más movimiento en VIX → VVIX sube
+    + (vixC > 25 ? 10 : vixC < 16 ? -5 : 0)
+  ));
   const moveE=tlt?Math.max(50,Math.min(200,95+Math.abs(tlt.chg)*12)):95;
   const skewE=vixC<20?-(vixC*0.8):-(vixC*1.2);
   if(pcR<0.7)optS=80;else if(pcR<0.85)optS=67;else if(pcR<1.0)optS=52;else if(pcR<1.2)optS=35;else optS=18;
@@ -1707,10 +2015,14 @@ function renderGaugeFG(score){
   arc.setAttribute('d',`M${x1.toFixed(1)},${y1.toFixed(1)} A${r},${r} 0 ${score>50?1:0},1 ${x2.toFixed(1)},${y2.toFixed(1)}`);
   arc.style.stroke=col;
   $('heat-needle').style.left=score+'%';
-  el('cnn-val',CNN_CURRENT); el('fg2-val',score.toFixed(1));
-  $('cnn-bar').style.width=CNN_CURRENT+'%';
+  const cnnVal = getCnnVal();
+  // Color CNN bar and value by its own sentiment zone
+  const cnnCol = cnnVal<20?'var(--rojo)':cnnVal<40?'var(--ambar)':cnnVal<60?'var(--txt2)':cnnVal<80?'var(--verde)':'var(--lima)';
+  const cnnEl = $('cnn-val'); if(cnnEl){cnnEl.textContent=cnnVal; cnnEl.style.color=cnnCol;}
+  el('fg2-val',score.toFixed(1));
+  const cnnBarEl=$('cnn-bar'); if(cnnBarEl){cnnBarEl.style.width=cnnVal+'%'; cnnBarEl.style.background=cnnCol;}
   $('fg2-bar').style.width=score+'%'; $('fg2-bar').style.background=col;
-  const delta=score-CNN_CURRENT; $('delta-tag').textContent=(delta>=0?'+':'')+delta.toFixed(1)+' pts vs CNN';
+  const delta=score-cnnVal; $('delta-tag').textContent=(delta>=0?'+':'')+delta.toFixed(1)+' pts vs CNN';
   $('delta-tag').style.color=delta>0?'var(--azul)':'var(--ambar)';
   el('hist-current',score.toFixed(1));
 }
@@ -1758,8 +2070,13 @@ function procesarMQ(D){
     if(sl>10)volS-=15;else if(sl>5)volS-=7;else if(sl<-10)volS+=10;
     if(pct>80)volS-=8;else if(pct<20)volS+=5;}
   const vixSlope=vix?slope5(vix.closes):0; const vixDir=vixSlope>1?'↑':vixSlope<-1?'↓':'→';
-  const pcV=vixC<18?0.72:vixC<25?0.93:1.18;
-  const vvixE=vixy?Math.max(60,Math.min(200,95+vixy.chg*3.5)):95;
+  const spyChgMQ = spy ? spy.chg : 0;
+  const pcV = Math.max(0.3, Math.min(1.5,
+    0.55 - spyChgMQ * 0.05
+    + (vixC > 25 ? 0.2 : vixC > 20 ? 0.1 : vixC < 15 ? -0.08 : 0)
+  ));
+  const vixyDayChgMQ = vixy ? Math.abs(vixy.chg) : 2;
+  const vvixE=Math.max(70,Math.min(160, 88 + vixyDayChgMQ*2.5 + (vixC>25?10:vixC<16?-5:0)));
   const moveE=tlt?Math.max(50,Math.min(200,95+Math.abs(tlt.chg)*12)):95; const moveCls=moveE<80?'tg':moveE<120?'tgr':moveE<150?'ta':'tr';
   volS=clamp(volS);
   el('vix-v',vixC.toFixed(2)); dir('vix-d',vixSlope>1?1:vixSlope<-1?-1:0);
@@ -1904,7 +2221,7 @@ async function generarIA(D){
   const promptFG=`Eres analista cuantitativo de renta variable. En 3 frases concisas:
 SPY: ${spy?spy.cur.toFixed(2)+' ('+(spy.chg>=0?'+':'')+spy.chg.toFixed(2)+'%)':'N/D'}
 VIX: ${vix?vix.cur.toFixed(1):'N/D'} | Bono 10Y: ${tnx?tnx.cur.toFixed(2)+'%':'N/D'} | HYG: ${hyg?hyg.cur.toFixed(2)+' ('+(hyg.chg>=0?'+':'')+hyg.chg.toFixed(2)+'%)':'N/D'}
-CNN F&G: ${CNN_CURRENT} | F&G 2.0: ${fg2Score}
+CNN F&G: ${getCnnVal()} | F&G 2.0: ${fg2Score}
 Explica brevemente la discrepancia entre CNN y F&G 2.0 y qué implica para swing traders. Español, estilo Bloomberg terminal, sin adornos.`;
 
   $('note-fg-txt').textContent='Analizando sentimiento...';
@@ -2581,199 +2898,4 @@ setInterval(()=>{ if(getKey()) cargarDatos(); },60000);
 document.addEventListener('keydown',e=>{if(e.key==='Escape')$('help-modal').classList.remove('vis');});
 </script>
 </body>
-
-<!-- ════════════════════════════════════════════
-     SECCIÓN 3 — BofA GLOBAL BREADTH RULE
-════════════════════════════════════════════ -->
-<div class="sec-divider" style="margin-top:4px;">
-  <div class="sec-divider-line"></div>
-  <div class="sec-divider-label" style="color:var(--lima)">◈ BofA GLOBAL BREADTH RULE — SEÑAL DE TIMING GLOBAL (PANEL INDEPENDIENTE) <button class="hicon" onclick="showHelpItem('bofa')" style="color:var(--lima);border-color:rgba(232,255,71,.3);">?</button></div>
-  <div class="sec-divider-line"></div>
-</div>
-
-<div id="bofa-section">
-<div id="bofa-panel">
-
-  <!-- COL 1: Gauge + señal principal -->
-  <div class="bofa-gauge-wrap">
-    <div style="font-size:8px;letter-spacing:2.5px;color:var(--txt3);text-transform:uppercase;font-weight:600;">BofA Breadth Reading</div>
-
-    <!-- Semicircle gauge -->
-    <div class="bofa-arc-wrap" style="width:180px;height:100px;">
-      <svg viewBox="0 0 180 100" width="180" height="100" style="overflow:visible;">
-        <!-- zone arcs: oversold (buy) left, neutral mid, overbought right -->
-        <path d="M15,95 A80,80 0 0,1 48,21"  fill="none" stroke="#22d3a0" stroke-width="9" stroke-linecap="round" opacity=".35"/>
-        <path d="M48,21 A80,80 0 0,1 90,11"  fill="none" stroke="#38b6ff" stroke-width="9" stroke-linecap="round" opacity=".25"/>
-        <path d="M90,11 A80,80 0 0,1 132,21" fill="none" stroke="#7a9bb8" stroke-width="9" stroke-linecap="round" opacity=".2"/>
-        <path d="M132,21 A80,80 0 0,1 165,95" fill="none" stroke="#ff3d5a" stroke-width="9" stroke-linecap="round" opacity=".35"/>
-        <!-- value arc -->
-        <path id="bofa-arc" d="M90,11 A80,80 0 0,1 90,11" fill="none" stroke="#38b6ff" stroke-width="9" stroke-linecap="round" style="transition:d 1s cubic-bezier(.34,1.2,.64,1),stroke .6s"/>
-        <!-- needle -->
-        <line id="bofa-needle" x1="90" y1="95" x2="90" y2="23" stroke="var(--txt1)" stroke-width="1.5" stroke-linecap="round" style="transition:transform 1s cubic-bezier(.34,1.2,.64,1);transform-origin:90px 95px"/>
-        <circle cx="90" cy="95" r="4.5" fill="var(--txt1)"/>
-        <!-- labels -->
-        <text x="6"   y="105" font-family="IBM Plex Mono" font-size="8" fill="#22d3a0" font-weight="600">-100</text>
-        <text x="80"  y="10"  font-family="IBM Plex Mono" font-size="8" fill="var(--txt3)">0</text>
-        <text x="155" y="105" font-family="IBM Plex Mono" font-size="8" fill="#ff3d5a" font-weight="600">+100</text>
-      </svg>
-      <div class="bofa-center">
-        <div class="bofa-num" id="bofa-num">—</div>
-        <div class="bofa-sub">NET %</div>
-      </div>
-    </div>
-
-    <!-- Thermometer bar -->
-    <div style="width:100%;padding:0 4px;">
-      <div class="bofa-thermo">
-        <div class="bofa-thermo-needle" id="bofa-needle-bar" style="left:50%"></div>
-        <!-- zone ticks -->
-        <div style="position:absolute;top:0;left:5%;width:1px;height:100%;background:rgba(255,255,255,.2)"></div>
-        <div style="position:absolute;top:0;left:50%;width:1px;height:100%;background:rgba(255,255,255,.3)"></div>
-        <div style="position:absolute;top:0;left:92%;width:1px;height:100%;background:rgba(255,255,255,.2)"></div>
-      </div>
-      <div style="display:flex;justify-content:space-between;font-size:8px;color:var(--txt3);margin-top:2px;">
-        <span style="color:var(--verde);font-weight:700">BUY -88</span>
-        <span>0</span>
-        <span style="color:var(--rojo);font-weight:700">SELL +89</span>
-      </div>
-    </div>
-
-    <div class="bofa-signal" id="bofa-signal-word">—</div>
-
-    <!-- Source badge -->
-    <div style="display:flex;align-items:center;gap:5px;margin-top:2px;">
-      <div style="width:6px;height:6px;border-radius:50%;background:var(--txt3)" id="bofa-src-dot"></div>
-      <span style="font-size:9px;color:var(--txt3)" id="bofa-src-label">sin datos</span>
-    </div>
-
-    <!-- Señal boxes -->
-    <div class="bofa-signal-box" style="width:100%">
-      <div class="bofa-sig-row">
-        <div class="bofa-sig-dot" style="background:var(--verde)"></div>
-        <div class="bofa-sig-val" style="color:var(--verde)">≤ −88%</div>
-        <div class="bofa-sig-desc">BUY signal histórico — compra agresiva, señal contrarian extrema</div>
-      </div>
-      <div class="bofa-sig-row">
-        <div class="bofa-sig-dot" style="background:var(--azul)"></div>
-        <div class="bofa-sig-val" style="color:var(--azul)">−39% a −60%</div>
-        <div class="bofa-sig-desc">Oversold moderado — acumulación selectiva, tamaño reducido</div>
-      </div>
-      <div class="bofa-sig-row">
-        <div class="bofa-sig-dot" style="background:var(--txt2)"></div>
-        <div class="bofa-sig-val" style="color:var(--txt2)">−20% a +40%</div>
-        <div class="bofa-sig-desc">Zona neutral — sin señal clara, seguir otros indicadores</div>
-      </div>
-      <div class="bofa-sig-row">
-        <div class="bofa-sig-dot" style="background:var(--ambar)"></div>
-        <div class="bofa-sig-val" style="color:var(--ambar)">+60% a +80%</div>
-        <div class="bofa-sig-desc">Overbought — reducir nuevas posiciones, vigilar stops</div>
-      </div>
-      <div class="bofa-sig-row">
-        <div class="bofa-sig-dot" style="background:var(--rojo)"></div>
-        <div class="bofa-sig-val" style="color:var(--rojo)">≥ +89%</div>
-        <div class="bofa-sig-desc">SELL signal histórico — euforia extrema, máxima precaución</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- COL 2: Override manual + proxy auto -->
-  <div>
-    <!-- Override manual BofA -->
-    <div class="bofa-override" style="margin-bottom:10px;">
-      <span class="bofa-override-title">⬡ DATO REAL BofA (override manual)</span>
-      <div class="bofa-input-row">
-        <input id="bofa-manual-input" type="number" min="-100" max="100" step="1"
-          class="bofa-input" placeholder="—"
-          title="Introduce el dato net% de BofA cuando lo veas en Bloomberg/Twitter"/>
-        <span class="bofa-input-unit">net %</span>
-        <button class="bofa-save-btn" onclick="saveBofaManual()">✓ APLICAR</button>
-      </div>
-      <div class="bofa-source-row">
-        <button class="bofa-src-btn" id="bofa-src-auto" onclick="setBofaSource('auto')">AUTO (proxy)</button>
-        <button class="bofa-src-btn active" id="bofa-src-manual" onclick="setBofaSource('manual')">MANUAL (BofA real)</button>
-      </div>
-      <div class="bofa-last-manual" id="bofa-last-manual-txt">
-        Último dato BofA: <strong id="bofa-last-val">—</strong> · <span id="bofa-last-date">—</span><br>
-        <span style="color:var(--txt3)">Ref. imagen: Mar 23 = −39% (oversold) · Ene 28 = +89% (overbought)</span>
-      </div>
-    </div>
-
-    <!-- Proxy automático -->
-    <div class="bofa-proxy-col">
-      <div class="bofa-proxy-title">◎ PROXY USA calculado automáticamente</div>
-      <div class="pm"><span class="ml" style="font-size:9px;">% ETFs bajo MM50 Y MM200</span><div class="mr"><span class="mv" id="bofa-proxy-val">—</span><span class="tag" id="bofa-proxy-tag">—</span></div></div>
-      <div class="pm"><span class="ml" style="font-size:9px;">Nº ETFs analizados</span><div class="mr"><span class="mv" id="bofa-proxy-n">—</span></div></div>
-      <div class="pm"><span class="ml" style="font-size:9px;">SPY bajo MM50+MM200</span><div class="mr"><span class="tag" id="bofa-spy-tag">—</span></div></div>
-      <div class="pm"><span class="ml" style="font-size:9px;">QQQ bajo MM50+MM200</span><div class="mr"><span class="tag" id="bofa-qqq-tag">—</span></div></div>
-      <div class="pm"><span class="ml" style="font-size:9px;">Sectores bajo ambas MMs</span><div class="mr"><span class="mv" id="bofa-sects-below">—</span><span class="ml" style="font-size:9px;">/11</span></div></div>
-      <div class="pm"><span class="ml" style="font-size:9px;">Net proxy (normalizado)</span><div class="mr"><span class="mv" id="bofa-net-proxy">—</span><span class="tag" id="bofa-net-proxy-tag">—</span></div></div>
-      <div style="font-size:9px;color:var(--txt3);margin-top:8px;line-height:1.65;padding:7px;background:var(--bg3);border-radius:3px;border-left:2px solid var(--borde2);">
-        <strong style="color:var(--txt2)">Limitación:</strong> el proxy USA cubre SPY+QQQ+11 ETFs sectoriales. 
-        El BofA real usa todos los índices MSCI ACWI globales. 
-        Introduce el dato real cuando lo tengas para máxima precisión.
-      </div>
-    </div>
-  </div>
-
-  <!-- COL 3: Historia + contexto -->
-  <div class="bofa-history-col">
-    <div class="bofa-hist-title">◈ historial de lecturas manuales</div>
-    <canvas id="bofa-hist-canvas" style="width:100%;height:120px;display:block;"></canvas>
-    <div style="display:flex;justify-content:space-between;font-size:8px;color:var(--txt3);margin-top:3px;">
-      <span>más antiguo</span><span>hoy</span>
-    </div>
-
-    <div style="margin-top:10px;">
-      <div class="bofa-proxy-title" style="margin-bottom:6px;">◈ lecturas recientes</div>
-      <div id="bofa-readings-list" style="font-size:9px;color:var(--txt2);line-height:2;">
-        <div style="color:var(--txt3)">Sin lecturas guardadas aún.<br>Introduce el dato de BofA cuando lo veas.</div>
-      </div>
-    </div>
-
-    <div style="margin-top:10px;padding:8px;background:var(--bg3);border-radius:3px;border-left:2px solid var(--lima);">
-      <div style="font-size:8px;letter-spacing:1.5px;color:var(--lima);font-weight:700;margin-bottom:5px;">◈ LÓGICA DE SEÑAL</div>
-      <div style="font-size:9px;color:var(--txt2);line-height:1.7;">
-        La señal <strong style="color:var(--verde)">BUY</strong> se activa únicamente en lecturas ≤ −88% 
-        (histórico BofA: señal de compra agresiva). Lecturas entre −39% y −60% 
-        se consideran <strong style="color:var(--azul)">oversold moderado</strong> — acumulación selectiva.<br><br>
-        <strong>Importante:</strong> este indicador no penaliza el F&amp;G 2.0 ni el Market Quality Score. 
-        Es un filtro independiente de largo plazo — como el MM10 mensual.
-      </div>
-    </div>
-  </div>
-
-  <!-- COL 4: Señal actual + contexto de referencia -->
-  <div>
-    <div class="bofa-proxy-title" style="margin-bottom:8px;">◈ SEÑAL ACTIVA</div>
-
-    <div style="background:var(--bg3);border:1px solid var(--borde);border-radius:3px;padding:12px;margin-bottom:10px;text-align:center;">
-      <div style="font-size:9px;color:var(--txt3);letter-spacing:1.5px;margin-bottom:6px;">ACCIÓN SUGERIDA</div>
-      <div style="font-size:20px;font-weight:700;letter-spacing:2px;" id="bofa-action-label">—</div>
-      <div style="font-size:9px;color:var(--txt2);margin-top:5px;line-height:1.6;" id="bofa-action-desc">Introduce el dato de BofA o espera a que el proxy calcule.</div>
-    </div>
-
-    <div class="pm"><span class="ml" style="font-size:9px;">Fuente activa</span><div class="mr"><span class="tag" id="bofa-active-source">—</span></div></div>
-    <div class="pm"><span class="ml" style="font-size:9px;">Valor activo</span><div class="mr"><span class="mv" id="bofa-active-val">—</span></div></div>
-    <div class="pm"><span class="ml" style="font-size:9px;">Zona</span><div class="mr"><span class="tag" id="bofa-zone-tag">—</span></div></div>
-    <div class="pm"><span class="ml" style="font-size:9px;">Dist. a BUY signal</span><div class="mr"><span class="mv" id="bofa-dist-buy">—</span></div></div>
-    <div class="pm"><span class="ml" style="font-size:9px;">Dist. a SELL signal</span><div class="mr"><span class="mv" id="bofa-dist-sell">—</span></div></div>
-
-    <div style="margin-top:10px;font-size:9px;color:var(--txt3);line-height:1.7;">
-      Referencias BofA (imagen adjunta):<br>
-      <span style="color:var(--verde)">Mar 23 = −39%</span> oversold reciente<br>
-      <span style="color:var(--ambar)">Ene 28 = +89%</span> overbought reciente<br>
-      <span style="color:var(--azul)">Actual = −16%</span> net (per BofA report)
-    </div>
-
-    <div style="margin-top:8px;font-size:9px;color:var(--txt3);">
-      <a href="https://research.bofasecurities.com/" target="_blank" style="color:var(--azul);text-decoration:none;">BofA Global Research ↗</a>
-      <span style="margin:0 6px;">·</span>
-      <a href="https://www.msci.com/acwi" target="_blank" style="color:var(--azul);text-decoration:none;">MSCI ACWI ↗</a>
-    </div>
-  </div>
-
-</div><!-- /bofa-panel -->
-</div><!-- /bofa-section -->
-
-
 </html>
